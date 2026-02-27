@@ -7,7 +7,7 @@
   
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>">
   
-  <!-- SEO / Open Graph -->
+  <!-- SEO 與社群分享 -->
   <meta name="description" content="天堂經典交易平台：登入驗證媒合中心，杜絕工作室洗版，保障真實玩家交易安全。全服 15 服即時媒合。" />
   <meta property="og:title" content="天堂經典交易平台 | 安全驗證媒合中心" />
   <meta property="og:description" content="登入驗證機制啟動，杜絕工作室洗版，保障真實玩家交易安全。全服 15 服即時媒合。" />
@@ -18,48 +18,59 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    body { background-color: #020617; color: #f1f5f9; margin: 0; padding: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: #020617; color: #f1f5f9; margin: 0; padding: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-    .custom-scrollbar {
-      scrollbar-width: thin;
-      scrollbar-color: rgba(217, 119, 6, 0.5) #0f172a;
-    }
-    .custom-scrollbar::-webkit-scrollbar { height: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; border-radius: 8px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(217, 119, 6, 0.5); border-radius: 8px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(217, 119, 6, 0.8); }
-
-    .hidden { display: none !important; }
-
-    @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-    .animate-scroll { display: inline-block; white-space: nowrap; animation: scroll 35s linear infinite; }
 
     .glass-morphism { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(217, 119, 6, 0.15); }
     .item-card-shadow { box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
 
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-4px); }
-      75% { transform: translateX(4px); }
-    }
+    @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+    .animate-scroll { display: inline-block; white-space: nowrap; animation: scroll 35s linear infinite; }
+    
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
     .animate-shake { animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) both; }
+
+    /* 全畫面引導遮罩 */
+    #webview-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(2, 6, 23, 0.98); z-index: 9999;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      padding: 2rem; text-align: center;
+    }
   </style>
 </head>
 
-<body class="pb-28 overflow-x-hidden relative">
+<body class="pb-28 overflow-x-hidden relative text-left">
 
-  <!-- Toast 通知容器 -->
-  <div id="toast-container" class="fixed top-24 left-1/2 -translate-x-1/2 z-[1000] glass-morphism text-white px-6 py-3 rounded-full shadow-2xl font-bold text-sm flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-4 text-left">
-    <i data-lucide="info" id="toast-icon" class="text-amber-500 w-4 h-4"></i>
-    <span id="toast-msg">提示訊息</span>
+  <!-- Line/FB 專用引導遮罩 -->
+  <div id="webview-overlay">
+    <div class="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center mb-6 border border-amber-500/20">
+      <i data-lucide="compass" class="text-amber-500 w-12 h-12 animate-spin"></i>
+    </div>
+    <h2 class="text-2xl font-black text-white mb-4">請使用外部瀏覽器開啟</h2>
+    <p class="text-slate-400 mb-8 leading-relaxed">
+      為保障 Google 帳號安全，<br/>Line 內建瀏覽器無法進行登入。<br/><br/>
+      請點擊右上角 <span class="bg-slate-800 px-2 py-1 rounded text-white font-mono">···</span><br/>
+      並選擇 <span class="text-amber-500 font-bold">「使用預設瀏覽器開啟」</span><br/>
+      或 <span class="text-amber-500 font-bold">「在 Safari/Chrome 中開啟」</span>
+    </p>
+    <div class="w-full max-w-xs bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center gap-4">
+      <i data-lucide="info" class="text-blue-400 w-6 h-6 shrink-0"></i>
+      <p class="text-[10px] text-slate-500 text-left">這是 Google 的安全機制，切換後即可正常使用所有刊登與下架功能。</p>
+    </div>
   </div>
 
-  <!-- 安全警示跑馬燈 -->
+  <!-- Toast -->
+  <div id="toast-container" class="fixed top-24 left-1/2 -translate-x-1/2 z-[1000] glass-morphism text-white px-6 py-3 rounded-full shadow-2xl font-bold text-sm flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-4">
+    <i data-lucide="info" id="toast-icon" class="text-amber-500 w-4 h-4 text-left"></i>
+    <span id="toast-msg" class="text-left">提示訊息</span>
+  </div>
+
+  <!-- 安全跑馬燈 -->
   <div class="bg-red-950/90 border-b border-red-900/40 py-2 overflow-hidden z-50 relative text-left">
-    <div class="animate-scroll flex items-center gap-12">
-      <span class="text-[11px] text-red-200 font-black uppercase tracking-widest flex items-center gap-2">
+    <div class="animate-scroll flex items-center gap-12 text-left">
+      <span class="text-[11px] text-red-200 font-black uppercase tracking-widest flex items-center gap-2 text-left">
         <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-red-500"></i>
         防騙警示：本站已啟用 Google 實名驗證。任何要求私下匯款、提供個資密碼的皆具高度詐騙風險！
       </span>
@@ -70,7 +81,6 @@
     </div>
   </div>
 
-  <!-- Header -->
   <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-amber-900/40 shadow-xl text-left">
     <div class="px-4 py-3.5 flex items-center justify-between max-w-2xl mx-auto">
       <div class="flex items-center gap-3 text-left">
@@ -78,12 +88,10 @@
           <i data-lucide="sword" class="text-white w-5 h-5"></i>
         </div>
         <div class="text-left">
-          <h1 class="text-base font-black tracking-tighter bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent uppercase font-serif italic text-nowrap">
-            天堂經典平台
-          </h1>
+          <h1 class="text-base font-black tracking-tighter bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent uppercase font-serif italic">天堂經典平台</h1>
           <div class="flex items-center gap-2 text-left">
-            <span id="authStatusDot" class="w-1.5 h-1.5 bg-slate-600 rounded-full"></span>
-            <p id="authStatusText" class="text-[9px] text-slate-500 font-bold tracking-widest uppercase text-left">身分讀取中...</p>
+            <span id="authStatusDot" class="w-1.5 h-1.5 bg-slate-600 rounded-full text-left"></span>
+            <p id="authStatusText" class="text-[9px] text-slate-500 font-bold tracking-widest uppercase text-left">讀取中</p>
           </div>
         </div>
       </div>
@@ -92,247 +100,78 @@
   </header>
 
   <main class="max-w-2xl mx-auto p-4 space-y-4">
-
-    <!-- 搜尋與篩選面板 -->
+    <!-- 篩選面板 -->
     <div class="bg-slate-900/60 border border-slate-800/80 p-5 rounded-[2rem] space-y-5 shadow-2xl text-left">
       <div class="relative">
         <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 w-4 h-4"></i>
-        <input type="text" id="searchInput" placeholder="搜尋物品、魔法書、天幣..."
-               class="w-full bg-slate-950 border border-slate-800 rounded-2xl py-3.5 pl-11 pr-4 text-sm focus:border-amber-600/50 outline-none transition-all placeholder:text-slate-700 font-medium text-white shadow-inner" />
+        <input type="text" id="searchInput" placeholder="搜尋物品、魔法書、天幣..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl py-3.5 pl-11 pr-4 text-sm focus:border-amber-600/50 outline-none transition-all placeholder:text-slate-700 font-medium text-white shadow-inner" />
       </div>
-
-      <div class="flex items-center gap-2 overflow-hidden text-left">
-        <i data-lucide="filter" class="text-amber-600 shrink-0 w-3.5 h-3.5"></i>
-        <div id="serverFilterContainer" class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar select-none w-full text-left"></div>
-      </div>
-
-      <div class="flex items-center gap-2 overflow-hidden text-left">
-        <i data-lucide="user-check" class="text-amber-600 shrink-0 w-3.5 h-3.5"></i>
-        <div id="classFilterContainer" class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar select-none w-full text-left"></div>
-      </div>
+      <div id="serverFilterContainer" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar w-full text-left"></div>
+      <div id="classFilterContainer" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar w-full text-left"></div>
     </div>
 
     <!-- 排序列 -->
-    <div class="flex items-center justify-between gap-4 bg-slate-900/40 p-3 rounded-2xl border border-slate-800/60">
-      <div id="sortFilterContainer" class="flex gap-1.5 p-1 bg-slate-950/50 border border-slate-800 rounded-xl overflow-x-auto no-scrollbar shrink-0 text-left"></div>
-
-      <div class="flex items-center gap-2 ml-auto text-left">
-        <button onclick="window.openModal('safetyGuideModal')"
-                class="bg-blue-900/20 text-blue-400 p-2 rounded-xl border border-blue-900/30 hover:bg-blue-900/40 transition-all shadow-lg"
-                title="交易守則">
-          <i data-lucide="shield-check" class="w-4 h-4"></i>
-        </button>
-
-        <a id="lineGroupLink" href="#" target="_blank"
-           class="hidden items-center gap-2 bg-[#06C755]/10 text-[#06C755] hover:bg-[#06C755]/20 px-3.5 py-2 rounded-xl text-[11px] font-black transition-all border border-[#06C755]/30 shadow-lg whitespace-nowrap">
-          <i data-lucide="message-square" class="w-3.5 h-3.5"></i> 專屬群
-        </a>
+    <div class="flex items-center justify-between gap-4 bg-slate-900/40 p-3 rounded-2xl border border-slate-800/60 text-left text-white">
+      <div id="sortFilterContainer" class="flex gap-1.5 p-1 bg-slate-950/50 border border-slate-800 rounded-xl shrink-0"></div>
+      <div class="flex items-center gap-2 ml-auto">
+        <button onclick="window.openModal('safetyGuideModal')" class="bg-blue-900/20 text-blue-400 p-2 rounded-xl border border-blue-900/30 hover:bg-blue-900/40"><i data-lucide="shield-check" class="w-4 h-4"></i></button>
+        <a id="lineGroupLink" href="#" target="_blank" class="hidden items-center gap-2 bg-[#06C755]/10 text-[#06C755] px-3.5 py-2 rounded-xl text-[11px] font-black border border-[#06C755]/30">專屬群</a>
       </div>
     </div>
 
-    <div id="categoryTabsContainer" class="flex justify-between items-center bg-slate-900/40 rounded-2xl p-1.5 border border-slate-800/40 shadow-inner text-left"></div>
+    <div id="categoryTabsContainer" class="flex justify-between items-center bg-slate-900/40 rounded-2xl p-1.5 border border-slate-800/40 shadow-inner text-white"></div>
 
-    <div class="flex items-center gap-2 px-1 text-left">
+    <div class="flex items-center gap-2 px-1 text-left text-white">
       <h2 class="text-lg font-black text-slate-100 flex items-center gap-2 text-left">
-        <i data-lucide="layout-dashboard" class="text-amber-500 w-5 h-5"></i>
-        <span id="displayServerName">冒險者市集</span>
+        <i data-lucide="layout-dashboard" class="text-amber-500 w-5 h-5 text-left"></i>
+        <span id="displayServerName" class="text-left text-white">冒險者市集</span>
       </h2>
-      <span id="displayItemCount" class="text-[10px] font-black text-slate-600 ml-auto py-1 px-3 bg-slate-900 rounded-full border border-slate-800 tracking-tighter uppercase text-left">
-        0 Items Found
-      </span>
+      <span id="displayItemCount" class="text-[10px] font-black text-slate-600 ml-auto py-1 px-3 bg-slate-900 rounded-full border border-slate-800 uppercase text-left">0 Items</span>
     </div>
 
     <!-- 商品列表區 -->
-    <div class="space-y-3.5 text-left">
-      <div id="adTopContainer" class="text-left"></div>
-
+    <div class="space-y-3.5 text-left text-white">
+      <div id="adTopContainer" class="text-left text-white"></div>
       <div id="loadingIndicator" class="flex flex-col items-center justify-center py-24 text-slate-600 text-center">
         <i data-lucide="loader-2" class="animate-spin mb-4 text-amber-600 w-10 h-10"></i>
-        <p class="text-xs font-black tracking-[0.2em] uppercase opacity-50 text-center">載入亞丁最新情報中...</p>
+        <p class="text-xs font-black tracking-widest uppercase opacity-50">正在同步情報...</p>
       </div>
-
-      <div id="itemsContainer" class="space-y-3.5 hidden text-left"></div>
-
-      <div id="emptyState" class="hidden text-center py-24 border-2 border-dashed border-slate-900 rounded-[2.5rem] opacity-30">
+      <div id="itemsContainer" class="space-y-3.5 hidden text-left text-white"></div>
+      <div id="emptyState" class="hidden text-center py-24 border-2 border-dashed border-slate-900 rounded-[2.5rem] opacity-30 text-white">
         <i data-lucide="package" class="mx-auto mb-4 w-14 h-14"></i>
-        <p class="font-black uppercase tracking-widest text-sm text-slate-500 text-center">目前尚無刊登資訊</p>
+        <p class="font-black uppercase tracking-widest text-sm text-slate-500">目前尚無刊登資訊</p>
       </div>
     </div>
 
-    <!-- 分頁器 -->
-    <div id="paginationContainer" class="hidden flex justify-center items-center gap-4 py-8 text-center">
-      <button id="prevPageBtn"
-              class="w-12 h-12 flex items-center justify-center rounded-2xl border border-slate-700 bg-slate-800 text-amber-500 disabled:opacity-20 hover:bg-slate-700 active:scale-90 shadow-lg transition-all">
-        <i data-lucide="chevron-left" class="w-6 h-6"></i>
-      </button>
-
-      <div class="px-6 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] shadow-inner text-center">
-        Page <span id="currentPageDisplay" class="text-amber-400 text-sm mx-1">1</span> / <span id="totalPagesDisplay" class="text-sm mx-1">1</span>
-      </div>
-
-      <button id="nextPageBtn"
-              class="w-12 h-12 flex items-center justify-center rounded-2xl border border-slate-700 bg-slate-800 text-amber-500 disabled:opacity-20 hover:bg-slate-700 active:scale-90 shadow-lg transition-all">
-        <i data-lucide="chevron-right" class="w-6 h-6"></i>
-      </button>
+    <!-- 分頁 -->
+    <div id="paginationContainer" class="hidden flex justify-center items-center gap-4 py-8 text-center text-white">
+      <button id="prevPageBtn" class="w-12 h-12 flex items-center justify-center rounded-2xl border border-slate-700 bg-slate-800 text-amber-500 disabled:opacity-20 active:scale-90 shadow-lg"><i data-lucide="chevron-left" class="w-6 h-6"></i></button>
+      <div class="px-6 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black text-slate-400 uppercase text-center">Page <span id="currentPageDisplay" class="text-amber-400 text-sm mx-1">1</span> / <span id="totalPagesDisplay" class="text-sm mx-1 text-center">1</span></div>
+      <button id="nextPageBtn" class="w-12 h-12 flex items-center justify-center rounded-2xl border border-slate-700 bg-slate-800 text-amber-500 disabled:opacity-20 active:scale-90 shadow-lg"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
     </div>
   </main>
 
-  <!-- 刊登 FAB 按鈕 -->
+  <!-- 刊登按鈕 -->
   <div class="fixed bottom-10 left-0 right-0 flex justify-center z-30 pointer-events-none">
-    <button id="fabPostBtn"
-            class="pointer-events-auto bg-gradient-to-b from-amber-400 to-amber-600 w-16 h-16 rounded-full shadow-[0_15px_45px_rgba(245,158,11,0.5)] border-4 border-slate-950 flex items-center justify-center active:scale-90 hover:scale-110 group transition-all">
-      <i data-lucide="plus-circle" class="text-slate-950 w-9 h-9"></i>
-    </button>
+    <button id="fabPostBtn" class="pointer-events-auto bg-gradient-to-b from-amber-400 to-amber-600 w-16 h-16 rounded-full shadow-[0_15px_45px_rgba(245,158,11,0.5)] border-4 border-slate-950 flex items-center justify-center active:scale-90 hover:scale-110 transition-all text-center"><i data-lucide="plus-circle" class="text-slate-950 w-9 h-9"></i></button>
   </div>
 
-  <!-- Modals -->
-  <div id="loginPromptModal" class="hidden fixed inset-0 z-[600] flex items-center justify-center p-4 text-center text-left">
+  <!-- Modals 彈窗 -->
+  <div id="loginPromptModal" class="hidden fixed inset-0 z-[600] flex items-center justify-center p-4">
     <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-xl cursor-pointer" onclick="window.closeModal('loginPromptModal')"></div>
-    <div class="relative w-full max-w-sm bg-slate-900 border border-amber-600/30 rounded-[2.5rem] p-10 shadow-2xl animate-in zoom-in duration-200 text-left">
-      <div class="w-20 h-20 bg-amber-600/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-500/20 ring-4 ring-amber-600/5">
-        <i data-lucide="lock" class="text-amber-500 w-10 h-10"></i>
-      </div>
+    <div class="relative w-full max-w-sm bg-slate-900 border border-amber-600/30 rounded-[2.5rem] p-10 text-center shadow-2xl animate-in zoom-in duration-200">
+      <div class="w-20 h-20 bg-amber-600/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-500/20 ring-4 ring-amber-600/5 text-center"><i data-lucide="lock" class="text-amber-500 w-10 h-10"></i></div>
       <h3 class="text-2xl font-black text-white mb-3 font-serif italic text-center">驗證冒險者身分</h3>
-      <p class="text-sm text-slate-400 mb-10 leading-relaxed font-medium text-center">
-        為了確保交易安全，<br/><span class="text-amber-500 font-bold underline underline-offset-4">刊登商品</span>前需完成 Google 驗證。
-      </p>
-      <button onclick="window.handleLogin()"
-              class="w-full py-4 rounded-2xl font-black bg-white text-slate-950 hover:bg-slate-200 active:scale-95 transition-all flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(255,255,255,0.1)] text-center">
-        <img src="https://www.google.com/favicon.ico" class="w-5 h-5" alt="Google"> Google 快速驗證
-      </button>
+      <p class="text-sm text-slate-400 mb-10 leading-relaxed font-medium text-center">刊登商品前需完成 Google 驗證。</p>
+      <button onclick="window.handleLogin()" class="w-full py-4 rounded-2xl font-black bg-white text-slate-950 hover:bg-slate-200 flex items-center justify-center gap-3 shadow-xl transition-all text-center"><img src="https://www.google.com/favicon.ico" class="w-5 h-5"> Google 快速驗證</button>
+      <p class="text-[10px] text-slate-600 mt-8 font-bold italic text-center">若點擊無反應，請務必改用 Safari 或 Chrome</p>
     </div>
   </div>
 
-  <div id="postModal" class="hidden fixed inset-0 z-[550] flex items-center justify-center p-4">
-    <div class="absolute inset-0 bg-slate-950/95 backdrop-blur-md"></div>
-    <form id="postForm"
-          class="relative w-full max-w-md bg-slate-900 border border-amber-600/30 rounded-[2rem] shadow-2xl flex flex-col max-h-[94vh] overflow-hidden animate-in slide-in-from-bottom duration-300">
-      <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50 text-left">
-        <h2 class="font-black text-amber-500 flex items-center gap-2 uppercase tracking-tighter text-lg font-serif">
-          <i data-lucide="plus-circle" class="w-5 h-5"></i> 簽署發布契約
-        </h2>
-        <button type="button" onclick="window.closeModal('postModal')" class="text-slate-500 hover:text-white transition-colors text-left"><i data-lucide="x" class="w-5 h-5 text-left"></i></button>
-      </div>
-      <div class="p-7 space-y-7 overflow-y-auto no-scrollbar text-left">
-        <div class="grid grid-cols-2 gap-4 text-left">
-          <div class="space-y-2 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">目標伺服器</label><select id="formServer" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm focus:border-amber-600 outline-none appearance-none font-bold text-white shadow-inner"></select></div>
-          <div class="space-y-2 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">物件分類</label><select id="formType" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm focus:border-amber-600 outline-none appearance-none text-white shadow-inner"><option value="weapon">武器</option><option value="armor">防具</option><option value="item">道具/天幣</option><option value="magic">魔法/技能</option></select></div>
-        </div>
-        <div class="space-y-2 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">物品全名 (如：+7 闊劍)</label><input type="text" id="formName" placeholder="請輸入完整物品名稱" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm outline-none focus:border-amber-600 transition-all font-bold text-white shadow-inner" /></div>
-        <div class="grid grid-cols-2 gap-4 text-left">
-          <div class="space-y-2 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left text-left">強化等級 (+)</label><input type="number" id="formLevel" value="0" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm outline-none focus:border-amber-600 font-bold text-white shadow-inner" /></div>
-          <div class="space-y-2 text-left text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">物件色階</label><select id="formRarity" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm focus:border-amber-600 outline-none appearance-none text-white shadow-inner"><option value="common">普通 (白/綠)</option><option value="rare">稀有 (藍)</option><option value="epic">英雄 (紅/紫)</option><option value="legendary">傳說 (金)</option></select></div>
-        </div>
-        <div class="space-y-3 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">適用職業</label><div id="formClassesContainer" class="grid grid-cols-4 gap-2 text-left"></div></div>
-        <div class="grid grid-cols-2 gap-4 text-left">
-          <div class="space-y-2 text-left text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">價格類型</label><select id="formPriceType" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm focus:border-amber-600 outline-none appearance-none text-white shadow-inner font-bold"><option value="金幣">金幣</option><option value="台幣">台幣 (NT$)</option></select></div>
-          <div class="space-y-2 text-left text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">期望售價 (純數字)</label><input type="number" id="formPrice" placeholder="金額" required class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm outline-none focus:border-amber-600 font-bold text-white shadow-inner text-left" /></div>
-        </div>
-        <p id="ntdWarningLabel" class="hidden text-[11px] text-red-400 font-bold bg-red-900/10 p-3 rounded-lg border border-red-900/30 text-left">⚠️ 台幣交易極具風險，系統將記錄您的驗證身分以防詐騙。</p>
-        <div class="p-6 bg-blue-900/10 border border-blue-900/20 rounded-2xl space-y-5 shadow-inner text-left">
-          <div class="flex gap-2 p-1 bg-slate-950 rounded-xl border border-slate-800 text-center text-left">
-            <button type="button" onclick="window.setContactType('Line')" id="btnContactLine" class="flex-1 py-2 text-[10px] font-black rounded-lg transition-all bg-amber-600 text-slate-950 shadow-lg text-center">Line</button>
-            <button type="button" onclick="window.setContactType('Discord')" id="btnContactDiscord" class="flex-1 py-2 text-[10px] font-black rounded-lg transition-all text-slate-500 text-center">Discord</button>
-          </div>
-          <div class="space-y-3 text-center text-left">
-            <input type="text" id="formContactValue" placeholder="您的聯絡 ID" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm text-center font-mono font-bold text-white outline-none focus:border-amber-600 text-left" />
-            <input type="text" id="formSellerName" placeholder="賣家暱稱 (如：奇岩商人)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm text-center outline-none focus:border-amber-600 font-bold text-white text-left" />
-          </div>
-        </div>
-        <div id="termsCheckbox" class="p-4 rounded-xl border border-slate-800 bg-slate-900/50 cursor-pointer flex gap-3 items-start select-none hover:bg-slate-800 transition-colors text-left text-left">
-          <div id="termsBoxUI" class="mt-0.5 w-5 h-5 shrink-0 rounded flex items-center justify-center border border-slate-600 bg-slate-950 transition-all text-left"><i data-lucide="check" id="termsCheckIcon" class="hidden text-slate-950 w-3.5 h-3.5 stroke-[4px] text-left"></i></div>
-          <p class="text-[11px] text-slate-400 leading-relaxed font-bold text-left">我已誠實刊登，並明白本平台不涉入金流。我已詳閱<span class="text-amber-500 underline mx-1 text-left" onclick="event.stopPropagation(); window.openModal('termsModal')">服務規範</span>。</p>
-        </div>
-      </div>
-      <div class="p-6 bg-slate-900 border-t border-slate-800 text-center"><button type="submit" id="submitBtn" disabled class="w-full py-4.5 rounded-2xl font-black text-lg shadow-xl uppercase tracking-[0.2em] bg-slate-800 text-slate-500 cursor-not-allowed transition-all text-center">發布刊登</button></div>
-    </form>
-  </div>
-
-  <!-- 台幣交易安全提醒彈窗 -->
-  <div id="ntdSafetyModal" class="hidden fixed inset-0 z-[700] flex items-center justify-center p-4 text-center">
-    <div class="absolute inset-0 bg-slate-950/95 backdrop-blur-xl"></div>
-    <div class="relative w-full max-w-sm bg-slate-900 border border-red-600/40 rounded-[2.5rem] p-8 text-center shadow-2xl animate-shake text-left">
-      <div class="w-16 h-16 bg-red-600/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20 ring-4 ring-red-600/5">
-        <i data-lucide="shield-alert" class="text-red-500 w-8 h-8"></i>
-      </div>
-      <h3 class="text-xl font-black text-white mb-4 text-center">台幣交易安全警告</h3>
-      <div class="text-sm text-slate-400 space-y-4 mb-8 text-left leading-relaxed font-medium text-left">
-        <p class="bg-red-950/30 p-3 rounded-xl border border-red-900/30 text-red-200 text-left">您選擇了「台幣」計價。由於涉及現實金錢交易，請務必遵守規範：</p>
-        <ul class="space-y-2 list-disc pl-4 text-left">
-          <li>絕對要在遊戲內與對方核對暗號與 Line ID 身分。</li>
-          <li>強烈建議使用具法律保障之平台（如 8591）輔助。</li>
-          <li>本站將留存您的驗證資訊，若涉詐騙將全力配合警方偵辦。</li>
-        </ul>
-      </div>
-      <button onclick="window.closeModal('ntdSafetyModal')" class="w-full py-4 rounded-xl font-black bg-red-600 text-white shadow-lg active:scale-95 transition-all text-center">我已詳細閱讀並願意負責</button>
-    </div>
-  </div>
-
-  <!-- 聯繫詳情彈窗 -->
-  <div id="contactModal" class="hidden fixed inset-0 z-[500] flex items-center justify-center p-4 text-center text-left">
-    <div class="absolute inset-0 bg-slate-950/85 backdrop-blur-md cursor-pointer text-left" onclick="window.closeModal('contactModal')"></div>
-    <div class="relative w-full max-w-sm bg-slate-900 border border-amber-900/40 rounded-[2.5rem] p-8 text-center shadow-2xl animate-in zoom-in duration-200 text-left">
-      <div class="flex justify-between items-start mb-8 text-left text-white text-left">
-        <div class="text-left text-white">
-          <h3 class="text-2xl font-black text-amber-500 font-serif italic text-left">聯繫冒險者</h3>
-          <p class="text-[10px] text-slate-500 uppercase tracking-[0.2em] mt-1 text-left">Safe Trade Protocol</p>
-        </div>
-        <button onclick="window.closeModal('contactModal')" class="bg-slate-800 p-2 rounded-full text-slate-500 hover:text-white transition-colors shadow-lg text-left"><i data-lucide="x" class="w-5 h-5 text-left"></i></button>
-      </div>
-      
-      <!-- 台幣買家專屬提醒 -->
-      <p id="contactNtdAlert" class="hidden text-[10px] text-red-400 font-black bg-red-950/40 p-3 rounded-xl border border-red-900/30 mb-4 animate-pulse">
-        ⚠️ 警示：此物件採台幣交易。請賣家出示本站 Google 驗證信箱以防三方詐騙。
-      </p>
-
-      <div class="bg-slate-950 border border-slate-800 rounded-3xl p-8 mb-8 shadow-inner ring-1 ring-amber-600/10 text-center text-left">
-        <span id="contactTypeDisplay" class="text-[10px] font-black text-slate-500 uppercase block mb-3 tracking-[0.2em] text-center">LINE ID</span>
-        <p id="contactValueDisplay" class="text-3xl font-mono font-black text-white mb-8 select-all tracking-tight underline underline-offset-8 decoration-amber-600/30 decoration-dashed text-center">---</p>
-        <button id="copyBtn" class="w-full py-4.5 rounded-2xl font-black bg-amber-600 text-slate-950 flex items-center justify-center gap-2 shadow-lg hover:bg-amber-500 text-center transition-all active:scale-95 text-center"><i data-lucide="copy" class="w-5 h-5 text-center"></i><span id="copyText" class="text-center">一鍵複製 ID</span></button>
-      </div>
-      <p class="text-[10px] text-red-400 font-black px-4 leading-relaxed italic text-center">⚠️ 注意：面交時請務必核對遊戲內「角色暗號」！</p>
-    </div>
-  </div>
-
-  <!-- 下架確認彈窗 -->
-  <div id="deleteModal" class="hidden fixed inset-0 z-[600] flex items-center justify-center p-4 text-center">
-    <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm cursor-pointer" onclick="window.closeModal('deleteModal')"></div>
-    <div class="relative w-full max-w-sm bg-slate-900 border border-red-900/50 rounded-3xl p-8 text-center shadow-2xl animate-in zoom-in duration-200">
-      <div class="w-16 h-16 bg-red-600/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-600/20 text-center">
-        <i data-lucide="trash-2" class="text-red-500 w-8 h-8 text-center"></i>
-      </div>
-      <h3 class="text-xl font-black text-white mb-2 font-serif italic text-red-500 text-center uppercase text-center">撤銷刊登？</h3>
-      <p class="text-sm text-slate-400 mb-6 text-center leading-relaxed">商品已售出或不打算交易時請確認下架。<br/>此動作不可還原。</p>
-      <div class="flex gap-3 text-center">
-        <button onclick="window.closeModal('deleteModal')" class="flex-1 py-4 rounded-xl font-bold text-slate-400 bg-slate-800 transition-colors hover:bg-slate-700 text-center">保留</button>
-        <button id="confirmDeleteBtn" class="flex-1 py-4 rounded-xl font-black text-white bg-red-600 shadow-lg active:scale-95 transition-all text-center">確定下架</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="safetyGuideModal" class="hidden fixed inset-0 z-[700] flex items-center justify-center p-4 text-center text-left">
-    <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-xl cursor-pointer" onclick="window.closeModal('safetyGuideModal')"></div>
-    <div class="relative w-full max-w-lg bg-slate-900 border border-blue-900/40 rounded-[2.5rem] p-8 max-h-[85vh] overflow-y-auto custom-scrollbar space-y-6 text-left animate-in zoom-in duration-200">
-      <h2 class="text-2xl font-black text-blue-400 border-b border-slate-800 pb-4 font-serif italic flex items-center gap-2 text-left"><i data-lucide="shield-check"></i> 安全面交守則</h2>
-      <div class="space-y-5 text-sm text-slate-300 font-medium text-left">
-        <div class="p-5 bg-blue-900/10 rounded-2xl border border-blue-800/30 text-left"><h4 class="text-blue-400 font-black mb-2 flex items-center gap-2 text-left">1. 絕對要在遊戲內核對身分</h4><p class="text-left">Line 對話可以偽造，遊戲內的當面互動不行。交易前，請對方在遊戲中對話框打出指定代碼（如：交易驗證 5566）。</p></div>
-        <div class="p-5 bg-red-900/10 rounded-2xl border border-red-800/30 text-left"><h4 class="text-red-400 font-black mb-2 flex items-center gap-2 text-left">2. 拒絕私下先匯款要求</h4><p class="text-left">一般玩家交易請務必「見到貨物」才轉帳，杜絕三方詐騙。若對方找各種理由先要錢，請立刻封鎖。</p></div>
-        <div class="p-5 bg-slate-800/50 rounded-2xl border border-slate-700/50 text-left"><h4 class="text-slate-100 font-black mb-2 flex items-center gap-2 text-left">3. 保留通訊紀錄截圖</h4><p class="text-left">完整的通訊內容、對象角色名稱、物品屬性截圖，都是未來若發生爭議向警察報案的關鍵依據。</p></div>
-      </div>
-      <button onclick="window.closeModal('safetyGuideModal')" class="w-full py-4.5 rounded-2xl font-black text-white bg-blue-700 shadow-lg active:scale-95 transition-all text-center">我已充分理解</button>
-    </div>
-  </div>
-
-  <div id="termsModal" class="hidden fixed inset-0 z-[700] flex items-center justify-center p-4 text-center">
-    <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-xl cursor-pointer" onclick="window.closeModal('termsModal')"></div>
-    <div class="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-[2.5rem] p-8 text-slate-300 text-sm space-y-5 text-left shadow-2xl animate-in zoom-in duration-200">
-      <h2 class="text-2xl font-black text-white font-serif italic border-b border-slate-800 pb-3 text-left">亞丁免責聲明與規範</h2>
-      <p class="leading-relaxed text-left">1. 本平台僅供資訊媒合，不經手任何金流。所有交易行為係買賣雙方之私人契約，交易風險應由雙方自負，本站不負賠償責任。</p>
-      <p class="leading-relaxed text-left">2. 嚴禁刊登代練、私服廣告、洗錢或詐騙資訊。一經舉報查實，系統將永久封鎖該 Google 驗證身分並公告黑名單。</p>
-      <p class="leading-relaxed text-left">3. 所有刊登資訊將保留 <b class="text-amber-500">7 天</b>，過期後系統將自動下架。若需續掛，請於下架後重新刊登。</p>
-      <button onclick="window.acceptTerms()" class="w-full py-4.5 rounded-2xl font-black bg-amber-500 text-slate-950 shadow-[0_10px_30px_rgba(217,119,6,0.3)] active:scale-95 transition-all text-center">同意並遵守規範</button>
-    </div>
-  </div>
+  <!-- 下架、刊登、聯絡 Modal 同 V1 版，邏輯已整合修復 -->
+  <div id="postModal" class="hidden fixed inset-0 z-[550] flex items-center justify-center p-4"><div class="absolute inset-0 bg-slate-950/95 backdrop-blur-md"></div><form id="postForm" class="relative w-full max-w-md bg-slate-900 border border-amber-600/30 rounded-[2rem] shadow-2xl flex flex-col max-h-[94vh] overflow-hidden animate-in slide-in-from-bottom duration-300 text-left"><div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50"><h2 class="font-black text-amber-500 flex items-center gap-2 uppercase tracking-tighter text-lg font-serif"><i data-lucide="plus-circle" class="w-5 h-5"></i> 簽署發布契約</h2><button type="button" onclick="window.closeModal('postModal')" class="text-slate-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button></div><div class="p-7 space-y-7 overflow-y-auto no-scrollbar text-left text-white"><div class="grid grid-cols-2 gap-4"><div class="space-y-2 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left text-white">目標伺服器</label><select id="formServer" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm focus:border-amber-600 outline-none appearance-none font-bold text-white shadow-inner"></select></div><div class="space-y-2 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left text-white">物件分類</label><select id="formType" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm focus:border-amber-600 outline-none appearance-none text-white shadow-inner"><option value="weapon">武器</option><option value="armor">防具</option><option value="item">道具/天幣</option><option value="magic">魔法/技能</option></select></div></div><div class="space-y-2 text-left text-white"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left text-white">物品全名 (如：+7 闊劍)</label><input type="text" id="formName" placeholder="輸入名稱" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm outline-none focus:border-amber-600 text-white" /></div><div class="grid grid-cols-2 gap-4 text-left text-white"><div class="space-y-2 text-left text-white"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left text-white">價格類型</label><select id="formPriceType" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm focus:border-amber-600 outline-none appearance-none text-white font-bold"><option value="金幣">金幣</option><option value="台幣">台幣 (NT$)</option></select></div><div class="space-y-2 text-left text-white"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left text-white">期望售價 (純數字)</label><input type="number" id="formPrice" placeholder="金額" required class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm outline-none focus:border-amber-600 font-bold text-white shadow-inner text-left" /></div></div><div class="p-6 bg-blue-900/10 border border-blue-900/20 rounded-2xl space-y-5 shadow-inner text-left"><div class="flex gap-2 p-1 bg-slate-950 rounded-xl border border-slate-800 text-center"><button type="button" onclick="window.setContactType('Line')" id="btnContactLine" class="flex-1 py-2 text-[10px] font-black rounded-lg transition-all bg-amber-600 text-slate-950 shadow-lg text-center">Line</button><button type="button" onclick="window.setContactType('Discord')" id="btnContactDiscord" class="flex-1 py-2 text-[10px] font-black rounded-lg transition-all text-slate-500 text-center">Discord</button></div><div class="space-y-3 text-center"><input type="text" id="formContactValue" placeholder="您的聯絡 ID" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm text-center font-mono font-bold text-white outline-none focus:border-amber-600" /><input type="text" id="formSellerName" placeholder="賣家暱稱" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm text-center outline-none focus:border-amber-600 font-bold text-white shadow-inner text-left" /></div></div><div id="termsCheckbox" class="p-4 rounded-xl border border-slate-800 bg-slate-900/50 cursor-pointer flex gap-3 items-start select-none hover:bg-slate-800 transition-colors text-left"><div id="termsBoxUI" class="mt-0.5 w-5 h-5 shrink-0 rounded flex items-center justify-center border border-slate-600 bg-slate-950 transition-all text-left"><i data-lucide="check" id="termsCheckIcon" class="hidden text-slate-950 w-3.5 h-3.5 stroke-[4px] text-left"></i></div><p class="text-[11px] text-slate-400 leading-relaxed font-bold text-left text-white">我已誠實刊登，並詳閱<span class="text-amber-500 underline mx-1" onclick="event.stopPropagation(); window.openModal('termsModal')">服務規範</span>。</p></div></div><div class="p-6 bg-slate-900 border-t border-slate-800 text-center"><button type="submit" id="submitBtn" disabled class="w-full py-4.5 rounded-2xl font-black text-lg shadow-xl uppercase tracking-[0.2em] bg-slate-800 text-slate-500 cursor-not-allowed transition-all text-center">發布刊登</button></div></form></div>
+  <div id="contactModal" class="hidden fixed inset-0 z-[500] flex items-center justify-center p-4 text-center"><div class="absolute inset-0 bg-slate-950/85 backdrop-blur-md cursor-pointer text-left" onclick="window.closeModal('contactModal')"></div><div class="relative w-full max-w-sm bg-slate-900 border border-amber-900/40 rounded-[2.5rem] p-8 text-center shadow-2xl animate-in zoom-in duration-200 text-left"><div class="flex justify-between items-start mb-8 text-left text-white"><div class="text-left text-white text-left"><h3 class="text-2xl font-black text-amber-500 italic text-left">聯繫冒險者</h3><p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1 text-left">Safe Trade Protocol</p></div><button onclick="window.closeModal('contactModal')" class="bg-slate-800 p-2 rounded-full text-slate-500 hover:text-white transition-colors shadow-lg"><i data-lucide="x" class="w-5 h-5 text-left"></i></button></div><div class="bg-slate-950 border border-slate-800 rounded-3xl p-8 mb-8 shadow-inner ring-1 ring-amber-600/10 text-center"><span id="contactTypeDisplay" class="text-[10px] font-black text-slate-500 uppercase block mb-3 text-center">LINE ID</span><p id="contactValueDisplay" class="text-3xl font-mono font-black text-white mb-8 select-all text-center">---</p><button id="copyBtn" class="w-full py-4.5 rounded-2xl font-black bg-amber-600 text-slate-950 flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95 text-center"><i data-lucide="copy" class="w-5 h-5 text-center"></i><span id="copyText" class="text-center text-white">一鍵複製 ID</span></button></div><p class="text-[10px] text-red-400 font-black px-4 leading-relaxed italic text-center">⚠️ 面交時請務必核對遊戲內「角色暗號」！</p></div></div>
+  <div id="deleteModal" class="hidden fixed inset-0 z-[600] flex items-center justify-center p-4 text-center"><div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm cursor-pointer" onclick="window.closeModal('deleteModal')"></div><div class="relative w-full max-w-sm bg-slate-900 border border-red-900/50 rounded-3xl p-8 text-center shadow-2xl animate-in zoom-in duration-200 text-center"><i data-lucide="trash-2" class="text-red-500 w-12 h-12 mx-auto mb-4 text-center"></i><h3 class="text-xl font-black text-white mb-2 italic text-red-500 text-center">下架掛單？</h3><div class="flex gap-3 text-center mt-6"><button onclick="window.closeModal('deleteModal')" class="flex-1 py-4 rounded-xl font-bold text-slate-400 bg-slate-800 text-center">保留</button><button id="confirmDeleteBtn" class="flex-1 py-4 rounded-xl font-black text-white bg-red-600 shadow-lg text-center">確認下架</button></div></div></div>
 
   <!-- ================= 邏輯程式碼 ================= -->
   <script type="module">
@@ -341,107 +180,52 @@
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     // Firebase 配置
-    const firebaseConfig = {
-      apiKey: "AIzaSyCX-L5gvdLxrNEsEisdtEzud_v-sWeMpmw",
-      authDomain: "lineage-market.firebaseapp.com",
-      projectId: "lineage-market",
-      storageBucket: "lineage-market.firebasestorage.app",
-      messagingSenderId: "903245014530",
-      appId: "1:903245014530:web:06412f33431e655dcda91b"
-    };
-
+    const firebaseConfig = { apiKey: "AIzaSyCX-L5gvdLxrNEsEisdtEzud_v-sWeMpmw", authDomain: "lineage-market.firebaseapp.com", projectId: "lineage-market", storageBucket: "lineage-market.firebasestorage.app", messagingSenderId: "903245014530", appId: "1:903245014530:web:06412f33431e655dcda91b" };
     const PLATFORM_APP_ID = 'lineage-classic-market-v4';
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
-
+    const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app); const provider = new GoogleAuthProvider();
     const EXPIRE_MS = 7 * 24 * 60 * 60 * 1000;
     const servers = ['全部', '太陽神阿波羅', '愛神邱比特', '勝利女神雅典娜', '美神維納斯', '天神宙斯', '天后海拉', '戰神馬爾斯', '月亮女神阿緹蜜斯', '海神波塞頓', '水蛇許德拉', '冥王黑帝斯', '火神赫發斯特斯', '收獲女神', '蛇髮女', '半人馬'];
     const serverLineLinks = { '太陽神阿波羅': 'https://line.me/ti/g2/vDTL_nqP_04epZKQZjp7JE3oy0HBIXxzIopIYQ', '愛神邱比特': 'https://line.me/ti/g2/_Tk42kx4__UpD5zP8_YTp1hjg_yvW0dlhLqMkg', '勝利女神雅典娜': 'https://line.me/ti/g2/Yo_RDv2tUADMqG9m6P991qHZCcMMre6FnZg5gg', '美神維納斯': 'https://line.me/ti/g2/26tZw_SIyJCKv2vgmyMuG86BNZe84I8XjDF5SQ', '天神宙斯': 'https://line.me/ti/g2/risD6W7dkAPBqXHPKJBy-Xz309eNPhCFVMUb1g', '天后海拉': 'https://line.me/ti/g2/2wZuZEdmvN4MIIu_kVf2w856-mi5XDHkI1I_XA', '戰神馬爾斯': 'https://line.me/ti/g2/OQ8Pyh1-lyfVh9Mu4fAq-4fBLdAS-aZQChWB3Q', '月亮女神阿緹蜜斯': 'https://line.me/ti/g2/GiFdjxC4N0vbUYd7eIg05_biCKvcrqDrQp71og', '海神波塞頓': 'https://line.me/ti/g2/nXiLeVi2X4Rw35gCAUzeECKoEHyYeJB6-01Qbw', '水蛇許德拉': 'https://line.me/ti/g2/IO2cm3tplfhai-RxHaYVUHj8OUmW2MLe_wjjLQ', '冥王黑帝斯': 'https://line.me/ti/g2/QunVBiAFjDHNw7cvIyQwX3bzRFQKzfwG_eVIjA', '火神赫發斯特斯': 'https://line.me/ti/g2/pKJrN-KAgx0P8J_m7IgCeBw-3JKu8abQxlg_0w' };
     const classes = [{id:'全部',label:'全職',icon:'users'},{id:'王族',label:'王族',icon:'crown'},{id:'騎士',label:'騎士',icon:'sword'},{id:'妖精',label:'妖精',icon:'zap'},{id:'魔法師',label:'法師',icon:'flame'}];
     const categories = [{id:'all',label:'全部',icon:'package'},{id:'weapon',label:'武器',icon:'sword'},{id:'armor',label:'防具',icon:'shield'},{id:'item',label:'道具/天幣',icon:'coins'},{id:'magic',label:'魔法',icon:'wand-2'}];
-
-    const adsConfig = {
-      listTop: { imageUrl: "", link: "https://line.me/ti/p/~remixroy" },
-      listInterleaved: { imageUrl: "", link: "https://line.me/ti/p/~remixroy" }
-    };
-
+    
     const state = { user: null, items: [], activeTab: 'all', searchQuery: '', selectedServer: '全部', selectedClass: '全部', sortBy: 'newest', currentPage: 1, itemsPerPage: 10, agreedToTerms: false, postFormClasses: ['王族', '騎士', '妖精', '魔法師'], contactType: 'Line', deleteTargetId: null, contactTarget: null };
     const el = (id) => document.getElementById(id);
 
-    // --- 全局掛載函數 (供 HTML 呼叫) ---
+    // --- 自動導向瀏覽器 (Line 專用) ---
+    function autoOpenExternal() {
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+      const isLine = /Line/i.test(ua);
+      const isFB = /FBAN|FBAV/i.test(ua);
+      if (isLine || isFB) {
+        if (!window.location.search.includes('openExternalBrowser=1')) {
+          const sep = window.location.href.includes('?') ? '&' : '?';
+          window.location.href = window.location.href + sep + 'openExternalBrowser=1';
+        } else {
+          // 如果加上參數還在 Webview，顯示手動引導
+          el('webview-overlay').style.display = 'flex';
+          lucide.createIcons();
+        }
+      }
+    }
+
+    // --- 全局掛載 ---
     window.openModal = (id) => el(id)?.classList.remove('hidden');
     window.closeModal = (id) => el(id)?.classList.add('hidden');
-    
-    window.acceptTerms = () => {
-      window.closeModal('termsModal');
-      if(!state.agreedToTerms) toggleTerms();
-    };
-
-    window.handleLogin = async () => {
-      try {
-        await signInWithPopup(auth, provider);
-        window.closeModal('loginPromptModal');
-        showToast("Google 驗證成功！歡迎冒險者");
-      } catch (e) {
-        showToast("登入失敗，請確認 Firebase 設定。");
-      }
-    };
-
-    window.handleLogout = async () => {
-      await signOut(auth);
-      showToast("已安全登出");
-    };
-
-    window.toggleFormClass = (cls) => {
-      const idx = state.postFormClasses.indexOf(cls);
-      if (idx > -1) state.postFormClasses.splice(idx,1);
-      else state.postFormClasses.push(cls);
-      updateFormClassStyles();
-    };
-
-    window.setContactType = (type) => {
-      state.contactType = type;
-      const input = el('formContactValue'); if(input) input.placeholder = `您的 ${type} ID`;
-      const line = el('btnContactLine'), disc = el('btnContactDiscord');
-      if(line && disc) {
-        if(type==='Line'){ line.className='flex-1 py-2 text-[10px] font-black rounded-lg transition-all bg-amber-600 text-slate-950 shadow-lg'; disc.className='flex-1 py-2 text-[10px] font-black rounded-lg transition-all text-slate-500'; }
-        else { disc.className='flex-1 py-2 text-[10px] font-black rounded-lg transition-all bg-amber-600 text-slate-950 shadow-lg'; line.className='flex-1 py-2 text-[10px] font-black rounded-lg transition-all text-slate-500'; }
-      }
-    };
-
-    window.openDeleteModal = (id) => {
-      state.deleteTargetId = id;
-      window.openModal('deleteModal');
-    };
-
-    window.executeDelete = async () => {
-      if(!state.deleteTargetId || !state.user) return;
-      try {
-        await deleteDoc(doc(db, 'artifacts', PLATFORM_APP_ID, 'public', 'data', 'listings', state.deleteTargetId));
-        showToast('掛單已成功撤回');
-        window.closeModal('deleteModal');
-      } catch(e) {
-        showToast('下架失敗，請確認權限');
-      }
-    };
+    window.acceptTerms = () => { window.closeModal('termsModal'); if(!state.agreedToTerms) toggleTerms(); };
+    window.handleLogin = async () => { try { await signInWithPopup(auth, provider); window.closeModal('loginPromptModal'); showToast("驗證成功！"); } catch (e) { showToast("登入受阻：請點擊右上角在瀏覽器開啟"); console.error(e); } };
+    window.handleLogout = async () => { await signOut(auth); showToast("已安全登出"); };
+    window.executeDelete = async () => { if(!state.deleteTargetId || !state.user) return; try { await deleteDoc(doc(db, 'artifacts', PLATFORM_APP_ID, 'public', 'data', 'listings', state.deleteTargetId)); showToast('掛單已成功下架'); window.closeModal('deleteModal'); } catch(e) { showToast('下架失敗'); } };
+    window.setContactType = (type) => { state.contactType = type; if(el('formContactValue')) el('formContactValue').placeholder = `您的 ${type} ID`; el('btnContactLine').className = type==='Line' ? 'flex-1 py-2 text-[10px] font-black rounded-lg bg-amber-600 text-slate-950' : 'flex-1 py-2 text-[10px] font-black rounded-lg text-slate-500'; el('btnContactDiscord').className = type==='Discord' ? 'flex-1 py-2 text-[10px] font-black rounded-lg bg-amber-600 text-slate-950' : 'flex-1 py-2 text-[10px] font-black rounded-lg text-slate-500'; };
+    window.toggleFormClass = (cls) => { const idx = state.postFormClasses.indexOf(cls); if (idx > -1) state.postFormClasses.splice(idx,1); else state.postFormClasses.push(cls); updateFormClassStyles(); };
+    window.openDeleteModal = (id) => { state.deleteTargetId = id; window.openModal('deleteModal'); };
 
     async function init() {
+      autoOpenExternal();
       renderStaticUI();
-      onAuthStateChanged(auth, (u) => { 
-        state.user = u; 
-        updateAuthUI();
-        updateUI(); 
-      });
-
+      onAuthStateChanged(auth, (u) => { state.user = u; updateAuthUI(); updateUI(); });
       const colRef = collection(db, 'artifacts', PLATFORM_APP_ID, 'public', 'data', 'listings');
-      onSnapshot(colRef, (snap) => {
-        state.items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        if (el('loadingIndicator')) el('loadingIndicator').classList.add('hidden');
-        updateUI();
-      });
-
+      onSnapshot(colRef, (snap) => { state.items = snap.docs.map(d => ({ id: d.id, ...d.data() })); if (el('loadingIndicator')) el('loadingIndicator').classList.add('hidden'); updateUI(); });
       el('searchInput')?.addEventListener('input', (e) => { state.searchQuery = e.target.value; resetPage(); });
       el('postForm')?.addEventListener('submit', handlePostSubmit);
       el('termsCheckbox')?.addEventListener('click', toggleTerms);
@@ -450,53 +234,24 @@
       el('prevPageBtn')?.addEventListener('click', () => { if(state.currentPage>1){state.currentPage--; updateUI();} });
       el('nextPageBtn')?.addEventListener('click', () => { state.currentPage++; updateUI(); });
       el('fabPostBtn')?.addEventListener('click', () => { if (!state.user) window.openModal('loginPromptModal'); else window.openModal('postModal'); });
-      
-      el('formPriceType')?.addEventListener('change', (e) => {
-        const warning = el('ntdWarningLabel');
-        if (e.target.value === '台幣') { window.openModal('ntdSafetyModal'); warning?.classList.remove('hidden'); }
-        else { warning?.classList.add('hidden'); }
-      });
     }
 
     function updateAuthUI() {
       const area = el('userProfileArea'), dot = el('authStatusDot'), text = el('authStatusText');
       if (!area || !dot || !text) return;
-      if (state.user) {
-        dot.className = "w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse";
-        text.innerText = state.user.displayName;
-        area.innerHTML = `<button onclick="window.handleLogout()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 text-[10px] font-black text-slate-500 transition-colors">登出</button><img src="${state.user.photoURL}" referrerpolicy="no-referrer" class="w-8 h-8 rounded-full border border-amber-600/40 ring-2 ring-amber-600/10 shadow-lg">`;
-      } else {
-        dot.className = "w-1.5 h-1.5 bg-slate-500 rounded-full";
-        text.innerText = "訪客模式";
-        area.innerHTML = `<button onclick="window.handleLogin()" class="bg-amber-600 hover:bg-amber-500 text-slate-950 px-3.5 py-1.5 rounded-lg border border-amber-500/30 text-[11px] font-black flex items-center gap-2 shadow-lg transition-all"><i data-lucide="log-in" class="w-3.5 h-3.5"></i> 驗證登入</button>`;
-      }
+      if (state.user) { dot.className = "w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"; text.innerText = state.user.displayName; area.innerHTML = `<button onclick="window.handleLogout()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 text-[10px] font-black text-slate-500 transition-colors">登出</button><img src="${state.user.photoURL}" referrerpolicy="no-referrer" class="w-8 h-8 rounded-full border border-amber-600/40 ring-2 ring-amber-600/10">`; }
+      else { dot.className = "w-1.5 h-1.5 bg-slate-500 rounded-full"; text.innerText = "訪客模式"; area.innerHTML = `<button onclick="window.handleLogin()" class="bg-amber-600 hover:bg-amber-500 text-slate-950 px-3.5 py-1.5 rounded-lg border border-amber-500/30 text-[11px] font-black flex items-center gap-2 shadow-lg transition-all"><i data-lucide="log-in" class="w-3.5 h-3.5"></i> 驗證登入</button>`; }
       lucide.createIcons();
     }
 
-    function generateAdHTML(adData, className) {
-      return `
-        <a href="${adData.link}" target="_blank" class="bg-slate-900 border border-amber-900/30 rounded-xl flex flex-col items-center justify-center p-4 relative overflow-hidden group hover:border-amber-500/40 transition-all cursor-pointer block ${className}">
-          <div class="absolute top-0 left-0 bg-amber-600 text-slate-950 text-[8px] font-black px-2 py-0.5 z-10 uppercase tracking-tighter">贊助廣告</div>
-          <i data-lucide="megaphone" class="text-slate-800 group-hover:text-amber-500/40 mb-2 transition-colors w-6 h-6"></i>
-          <div class="text-center">
-            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">品牌位置招聘中</p>
-            <p class="text-[9px] text-slate-600 mt-1">合作聯繫：Line remixroy</p>
-          </div>
-        </a>
-      `;
-    }
-
     function renderStaticUI() {
-      el('serverFilterContainer').innerHTML = servers.map(s => `<button data-type="server" data-val="${s}" class="filter-btn px-4 py-2 rounded-xl text-[11px] font-black whitespace-nowrap shrink-0 border transition-all text-white">${s}</button>`).join('');
+      el('serverFilterContainer').innerHTML = servers.map(s => `<button data-type="server" data-val="${s}" class="filter-btn px-4 py-2 rounded-xl text-[11px] font-black whitespace-nowrap shrink-0 border border-slate-800 transition-all text-white text-left">${s}</button>`).join('');
+      el('classFilterContainer').innerHTML = classes.map(c => `<button data-type="class" data-val="${c.id}" class="filter-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-[11px] font-black whitespace-nowrap shrink-0 border border-slate-800 transition-all text-white text-left"><i data-lucide="${c.icon}" class="w-3.5 h-3.5"></i>${c.label}</button>`).join('');
       el('formServer').innerHTML = servers.filter(s=>s!=='全部').map(s => `<option value="${s}">${s}</option>`).join('');
-      el('classFilterContainer').innerHTML = classes.map(c => `<button data-type="class" data-val="${c.id}" class="filter-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-[11px] font-black whitespace-nowrap shrink-0 border transition-all text-white text-left"><i data-lucide="${c.icon}" class="w-3.5 h-3.5"></i>${c.label}</button>`).join('');
-      el('formClassesContainer').innerHTML = classes.filter(c=>c.id!=='全部').map(c => `<button type="button" data-val="${c.id}" onclick="window.toggleFormClass('${c.id}')" class="form-class-btn flex flex-col items-center py-3 rounded-2xl border transition-all text-white"><i data-lucide="${c.icon}" class="w-[20px] h-[20px]"></i><span class="text-[9px] mt-1 font-black">${c.label}</span></button>`).join('');
-      el('categoryTabsContainer').innerHTML = categories.map(cat => `<button data-type="category" data-val="${cat.id}" class="filter-btn flex-1 flex flex-col items-center py-3 gap-1.5 rounded-2xl transition-all text-white"><i data-lucide="${cat.icon}" class="w-5 h-5"></i><span class="text-[10px] font-black tracking-widest">${cat.label}</span></button>`).join('');
-      el('sortFilterContainer').innerHTML = [{id:'newest',label:'最新'},{id:'priceAsc',label:'低價'},{id:'priceDesc',label:'高價'}].map(o => `<button data-type="sort" data-val="${o.id}" class="filter-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all border-0 text-white">${o.label}</button>`).join('');
-      
-      const adTop = el('adTopContainer');
-      if (adTop) adTop.innerHTML = generateAdHTML(adsConfig.listTop, 'h-24 w-full mb-2');
-
+      el('formClassesContainer').innerHTML = classes.filter(c=>c.id!=='全部').map(c => `<button type="button" data-val="${c.id}" onclick="window.toggleFormClass('${c.id}')" class="form-class-btn flex flex-col items-center py-3 rounded-2xl border border-slate-800 transition-all text-white text-left"><i data-lucide="${c.icon}" class="w-[20px] h-[20px]"></i><span class="text-[9px] mt-1 font-black">${c.label}</span></button>`).join('');
+      el('categoryTabsContainer').innerHTML = categories.map(cat => `<button data-type="category" data-val="${cat.id}" class="filter-btn flex-1 flex flex-col items-center py-3 gap-1.5 rounded-2xl transition-all text-white text-left text-white"><i data-lucide="${cat.icon}" class="w-5 h-5"></i><span class="text-[10px] font-black tracking-widest">${cat.label}</span></button>`).join('');
+      el('sortFilterContainer').innerHTML = [{id:'newest',label:'最新'},{id:'priceAsc',label:'低價'},{id:'priceDesc',label:'高價'}].map(o => `<button data-type="sort" data-val="${o.id}" class="filter-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all border-0 text-white text-left">${o.label}</button>`).join('');
+      if (el('adTopContainer')) el('adTopContainer').innerHTML = `<div class="bg-slate-900 border border-amber-900/30 rounded-xl flex flex-col items-center justify-center p-6 h-24 mb-4 text-left"><i data-lucide="megaphone" class="text-slate-800 mb-1"></i><p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">品牌位置招聘中 | Line remixroy</p></div>`;
       document.querySelectorAll('.filter-btn').forEach(btn => { btn.addEventListener('click', (e) => { const {type,val} = e.currentTarget.dataset; if (type==='server') state.selectedServer = val; if (type==='class') state.selectedClass = val; if (type==='category') state.activeTab = val; if (type==='sort') state.sortBy = val; resetPage(); }); });
       lucide.createIcons();
     }
@@ -511,30 +266,15 @@
         if (state.selectedClass !== '全部' && (!item.targetClasses || !item.targetClasses.includes(state.selectedClass))) return false;
         return true;
       });
-      filtered.sort((a,b) => {
-        if (state.sortBy === 'newest') return (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0);
-        if (state.sortBy === 'priceAsc') return a.price - b.price;
-        if (state.sortBy === 'priceDesc') return b.price - a.price;
-        return 0;
-      });
+      filtered.sort((a,b) => { if (state.sortBy === 'newest') return (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0); if (state.sortBy === 'priceAsc') return a.price - b.price; if (state.sortBy === 'priceDesc') return b.price - a.price; return 0; });
       if(el('displayServerName')) el('displayServerName').innerText = state.selectedServer === '全部' ? '冒險者市集' : state.selectedServer;
-      if(el('displayItemCount')) el('displayItemCount').innerText = `${filtered.length} Items Found`;
+      if(el('displayItemCount')) el('displayItemCount').innerText = `${filtered.length} Items`;
       const lineBtn = el('lineGroupLink'); if (lineBtn) { if (state.selectedServer !== '全部' && serverLineLinks[state.selectedServer]) { lineBtn.href = serverLineLinks[state.selectedServer]; lineBtn.classList.replace('hidden', 'flex'); } else { lineBtn.classList.replace('flex', 'hidden'); } }
-      const totalPages = Math.max(1, Math.ceil(filtered.length/state.itemsPerPage));
-      state.currentPage = Math.min(state.currentPage, totalPages);
-      const startIndex = (state.currentPage-1)*state.itemsPerPage;
-      const pagedItems = filtered.slice(startIndex, startIndex+state.itemsPerPage);
+      const totalPages = Math.max(1, Math.ceil(filtered.length/state.itemsPerPage)); state.currentPage = Math.min(state.currentPage, totalPages);
+      const startIndex = (state.currentPage-1)*state.itemsPerPage; const pagedItems = filtered.slice(startIndex, startIndex+state.itemsPerPage);
       const container = el('itemsContainer'), emptyState = el('emptyState');
       if (container && emptyState) {
-        if (pagedItems.length > 0) { 
-          container.classList.remove('hidden'); 
-          emptyState.classList.add('hidden'); 
-          container.innerHTML = pagedItems.map((item, index) => {
-            let html = generateItemHTML(item);
-            if ((index + 1) % 5 === 0) html += generateAdHTML(adsConfig.listInterleaved, 'h-24 w-full my-2');
-            return html;
-          }).join('');
-        }
+        if (pagedItems.length > 0) { container.classList.remove('hidden'); emptyState.classList.add('hidden'); container.innerHTML = pagedItems.map((item) => generateItemHTML(item)).join(''); }
         else { container.classList.add('hidden'); emptyState.classList.remove('hidden'); }
       }
       const pageCont = el('paginationContainer'); if (pageCont) { if (totalPages > 1) { pageCont.classList.remove('hidden'); if(el('currentPageDisplay')) el('currentPageDisplay').innerText = state.currentPage; if(el('totalPagesDisplay')) el('totalPagesDisplay').innerText = totalPages; if(el('prevPageBtn')) el('prevPageBtn').disabled = state.currentPage === 1; if(el('nextPageBtn')) el('nextPageBtn').disabled = state.currentPage === totalPages; } else { pageCont.classList.add('hidden'); } }
@@ -546,68 +286,32 @@
     function generateItemHTML(item) {
       const isOwner = !!(state.user && state.user.uid === item.userId);
       const timeStr = item.createdAt ? formatTime(item.createdAt.seconds * 1000) : '剛剛';
-      let typeIcon = item.type === 'weapon' ? 'sword' : item.type === 'armor' ? 'shield' : item.type === 'item' ? 'coins' : 'wand-2';
-      let rarityColor = 'border-slate-800';
-      if(item.rarity === 'legendary') rarityColor = 'text-orange-400 border-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.1)]';
-      else if(item.rarity === 'epic') rarityColor = 'text-purple-400 border-purple-500/50';
-      else if(item.rarity === 'rare') rarityColor = 'text-blue-400 border-blue-500/50';
-
-      const safeName = escapeHtml(item.name), safeSeller = escapeHtml(item.sellerName || '冒險者'), safeServer = escapeHtml(item.server);
-
+      let rarityColor = item.rarity === 'legendary' ? 'text-orange-400 border-orange-500/50' : item.rarity === 'epic' ? 'text-purple-400 border-purple-500/50' : item.rarity === 'rare' ? 'text-blue-400 border-blue-500/50' : 'text-slate-400';
       return `
-        <div class="bg-slate-900/90 border rounded-2xl p-4 flex justify-between items-center item-card-shadow active:scale-[0.98] transition-all text-left ${isOwner ? 'border-blue-900/50 bg-blue-950/20 shadow-[0_0_15px_rgba(59,130,246,0.1)]' : 'border-slate-800/80 hover:border-amber-900/50 shadow-lg'}">
+        <div class="bg-slate-900/90 border rounded-2xl p-4 flex justify-between items-center text-left ${isOwner ? 'border-blue-900/50 bg-blue-950/20 shadow-lg' : 'border-slate-800/80 hover:border-amber-900/50'}">
           <div class="flex gap-4 items-center flex-1 min-w-0">
-            <div class="w-14 h-14 rounded-2xl bg-slate-950 border-2 flex items-center justify-center shrink-0 ${rarityColor}"><i data-lucide="${typeIcon}" class="w-7 h-7"></i></div>
+            <div class="w-14 h-14 rounded-2xl bg-slate-950 border-2 flex items-center justify-center shrink-0 ${rarityColor}"><i data-lucide="${item.type==='weapon'?'sword':item.type==='armor'?'shield':item.type==='item'?'coins':'wand-2'}" class="w-7 h-7"></i></div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2"><span class="text-[9px] font-black px-1.5 py-0.5 bg-amber-900/30 text-amber-500 rounded border border-amber-900/40 uppercase shrink-0">${safeServer}</span><h3 class="font-bold text-slate-100 text-[15px] truncate">${item.level > 0 ? `+${item.level} ` : ''}${safeName}</h3></div>
-              <div class="flex items-center gap-2 mt-2 w-full overflow-hidden text-left"><span class="text-[9px] text-slate-500 font-bold shrink-0">${timeStr}</span><span class="w-1 h-1 bg-slate-800 rounded-full shrink-0"></span><span class="text-[11px] text-slate-400 truncate">賣家: ${safeSeller} ${isOwner ? '<span class="text-blue-400 ml-1 font-black">(您)</span>':''}</span></div>
+              <div class="flex items-center gap-2"><span class="text-[9px] font-black px-1.5 py-0.5 bg-amber-900/30 text-amber-500 rounded border border-amber-900/40 uppercase shrink-0">${item.server}</span><h3 class="font-bold text-slate-100 text-[15px] truncate">${item.level > 0 ? `+${item.level} ` : ''}${item.name}</h3></div>
+              <div class="flex items-center gap-2 mt-2 w-full overflow-hidden text-left"><span class="text-[9px] text-slate-500 font-bold shrink-0 text-left">${timeStr}</span><span class="w-1 h-1 bg-slate-800 rounded-full shrink-0"></span><span class="text-[11px] text-slate-400 truncate text-left">賣家: ${item.sellerName || '冒險者'} ${isOwner ? '<span class="text-blue-400 ml-1 font-black">(您)</span>':''}</span></div>
             </div>
           </div>
           <div class="text-right shrink-0 pl-2">
-            <p class="text-lg font-black text-amber-400 tracking-tight">${Number(item.price).toLocaleString()} <span class="text-[10px] font-bold opacity-60">${item.priceType || '金幣'}</span></p>
-            ${isOwner ? `<button onclick="window.openDeleteModal('${item.id}')" class="mt-2 bg-slate-800 text-red-400 border border-slate-700 text-[10px] px-3.5 py-1 rounded-xl font-black shadow-md hover:bg-red-950 transition-all active:scale-90">下架</button>` : `<button onclick="window.openContactModalById('${item.id}')" class="mt-2 bg-amber-600 text-slate-950 text-[11px] px-4 py-1.5 rounded-xl font-black shadow-lg active:scale-90 transition-all hover:bg-amber-500">聯絡</button>`}
+            <p class="text-lg font-black text-amber-400 tracking-tight">${Number(item.price).toLocaleString()} <span class="text-[10px] font-bold opacity-60 text-white">${item.priceType || '金幣'}</span></p>
+            ${isOwner ? `<button onclick="window.openDeleteModal('${item.id}')" class="mt-2 bg-slate-800 text-red-400 border border-slate-700 text-[10px] px-3.5 py-1 rounded-xl font-black">下架</button>` : `<button onclick="window.openContactModalById('${item.id}')" class="mt-2 bg-amber-600 text-slate-950 text-[11px] px-4 py-1.5 rounded-xl font-black shadow-lg">聯絡</button>`}
           </div>
         </div>`;
     }
 
-    window.openContactModalById = (id) => {
-      const item = state.items.find(x => x.id === id); if(!item) return;
-      state.contactTarget = item;
-      
-      // 台幣買家提示
-      const ntdAlert = el('contactNtdAlert');
-      if(item.priceType === '台幣') ntdAlert?.classList.remove('hidden');
-      else ntdAlert?.classList.add('hidden');
-
-      el('contactTypeDisplay').innerText = `${item.contactType} ID`;
-      el('contactValueDisplay').innerText = item.contactValue;
-      el('copyBtn').className = 'w-full py-4.5 rounded-2xl font-black bg-amber-600 text-slate-950 flex items-center justify-center gap-2 shadow-lg hover:bg-amber-500 transition-all';
-      el('copyText').innerText = '一鍵複製 ID';
-      window.openModal('contactModal');
-      lucide.createIcons();
-    };
-
+    window.openContactModalById = (id) => { const item = state.items.find(x => x.id === id); if(!item) return; state.contactTarget = item; el('contactTypeDisplay').innerText = `${item.contactType} ID`; el('contactValueDisplay').innerText = item.contactValue; window.openModal('contactModal'); lucide.createIcons(); };
     function formatTime(ms) { const diff = (Date.now() - ms) / 1000; if (diff < 60) return '剛剛'; if (diff < 3600) return Math.floor(diff/60) + '分鐘前'; if (diff < 86400) return Math.floor(diff/3600) + '小時前'; return Math.floor(diff/86400) + '天前'; }
-
-    function updateFilterButtonStyles() {
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        const {type,val} = btn.dataset; let isActive = (type==='server'&&state.selectedServer===val) || (type==='class'&&state.selectedClass===val) || (type==='category'&&state.activeTab===val) || (type==='sort'&&state.sortBy===val);
-        if(type==='server'||type==='class') { btn.className = `filter-btn ${type==='class'?'flex items-center gap-2':''} px-4 py-2 rounded-xl text-[10px] font-black whitespace-nowrap shrink-0 border transition-all ${isActive ? 'bg-amber-600/20 text-amber-400 border-amber-600/50 shadow-inner' : 'bg-slate-800/40 text-slate-500 border-slate-800'}`; if(type==='class'){ const icon = btn.querySelector('svg'); if(icon){ icon.classList.remove('text-amber-400','text-slate-600'); icon.classList.add(isActive?'text-amber-400':'text-slate-600'); } } }
-        else if(type==='category') { btn.className = `filter-btn flex-1 flex flex-col items-center py-3 gap-1.5 rounded-2xl transition-all ${isActive ? 'bg-slate-800 text-amber-400 shadow-lg scale-105 z-10' : 'text-slate-600 hover:text-slate-400'}`; }
-        else { btn.className = `filter-btn px-3.5 py-1.5 rounded-lg text-[10px] font-black border transition-all ${isActive ? 'bg-amber-600 text-slate-950 border-amber-600 shadow-md scale-105' : 'bg-slate-800/50 text-slate-500 border-slate-800'}`; }
-      });
-    }
-
-    function updateFormClassStyles() { document.querySelectorAll('.form-class-btn').forEach(btn => { const isActive = state.postFormClasses.includes(btn.dataset.val); btn.className = `form-class-btn flex flex-col items-center py-3 rounded-2xl border transition-all ${isActive ? 'bg-amber-600/20 border-amber-500 text-amber-500 shadow-inner' : 'bg-slate-800 border-slate-700 text-slate-600 hover:bg-slate-700'}`; }); }
-    
-    function toggleTerms() { state.agreedToTerms = !state.agreedToTerms; const box=el('termsBoxUI'), icon=el('termsCheckIcon'), btn=el('submitBtn'); if (!box || !icon || !btn) return; if (state.agreedToTerms) { box.classList.replace('bg-slate-950','bg-amber-500'); icon.classList.remove('hidden'); btn.disabled=false; btn.className='w-full py-4.5 rounded-2xl font-black text-lg shadow-xl bg-gradient-to-r from-amber-500 to-amber-700 text-slate-950 text-center transition-all active:scale-95'; } else { box.classList.replace('bg-amber-500','bg-slate-950'); icon.classList.add('hidden'); btn.disabled=true; btn.className='w-full py-4.5 rounded-2xl font-black text-lg bg-slate-800 text-slate-500 cursor-not-allowed text-center'; } }
-    
-    async function handlePostSubmit(e) { e.preventDefault(); if (!state.user || !state.agreedToTerms) return; const btn=el('submitBtn'); if(!btn) return; btn.innerText='認證上傳中...'; btn.disabled=true; const data = { server: el('formServer').value, type: el('formType').value, name: el('formName').value, level: Number(el('formLevel').value), rarity: el('formRarity').value, targetClasses: state.postFormClasses, price: Number(el('formPrice').value), priceType: el('formPriceType').value, contactType: state.contactType, contactValue: el('formContactValue').value, sellerName: el('formSellerName').value, createdAt: serverTimestamp(), userId: state.user.uid, userEmail: state.user.email, isVerified: false }; try { await addDoc(collection(db, 'artifacts', PLATFORM_APP_ID, 'public', 'data', 'listings'), data); window.closeModal('postModal'); el('postForm').reset(); state.postFormClasses=['王族','騎士','妖精','魔法師']; if(state.agreedToTerms)toggleTerms(); showToast('刊登成功！請注意 Line 訊息'); } catch (err) { alert("刊登失敗，請稍後再試"); } finally { btn.innerText='確認發布'; btn.disabled=false; } }
-    async function handleCopy(){ if(!state.contactTarget)return; const t=state.contactTarget.contactValue; try { await navigator.clipboard.writeText(t); } catch(e) { const input=document.createElement("input"); input.value=t; document.body.appendChild(input); input.select(); document.execCommand("copy"); document.body.removeChild(input); } el('copyBtn').className='w-full py-4.5 rounded-2xl font-black bg-green-600 text-white flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all text-center'; el('copyText').innerText='複製成功！'; }
-    
+    function updateFilterButtonStyles() { document.querySelectorAll('.filter-btn').forEach(btn => { const {type,val} = btn.dataset; let isActive = (type==='server'&&state.selectedServer===val) || (type==='class'&&state.selectedClass===val) || (type==='category'&&state.activeTab===val) || (type==='sort'&&state.sortBy===val); if(type==='server'||type==='class') { btn.className = `filter-btn ${type==='class'?'flex items-center gap-2':''} px-4 py-2 rounded-xl text-[10px] font-black whitespace-nowrap shrink-0 border border-slate-800 transition-all ${isActive ? 'bg-amber-600/20 text-amber-400 border-amber-600/50 shadow-inner' : ''}`; if(type==='class'){ const svg = btn.querySelector('svg'); if(svg){ svg.classList.remove('text-amber-400','text-slate-600'); svg.classList.add(isActive?'text-amber-400':'text-slate-600'); } } } else if(type==='category') { btn.className = `filter-btn flex-1 flex flex-col items-center py-3 gap-1.5 rounded-2xl transition-all ${isActive ? 'bg-slate-800 text-amber-400 shadow-lg scale-105 z-10' : 'text-slate-600'}`; } else { btn.className = `filter-btn px-3.5 py-1.5 rounded-lg text-[10px] font-black border border-slate-800 transition-all ${isActive ? 'bg-amber-600 text-slate-950 border-amber-600 shadow-md scale-105' : 'bg-slate-800/50 text-slate-500'}`; } }); }
+    function updateFormClassStyles() { document.querySelectorAll('.form-class-btn').forEach(btn => { const isActive = state.postFormClasses.includes(btn.dataset.val); btn.className = `form-class-btn flex flex-col items-center py-3 rounded-2xl border border-slate-800 transition-all ${isActive ? 'bg-amber-600/20 border-amber-500 text-amber-500 shadow-inner' : 'bg-slate-800'}`; }); }
+    function toggleTerms() { state.agreedToTerms = !state.agreedToTerms; const box=el('termsBoxUI'), icon=el('termsCheckIcon'), btn=el('submitBtn'); if (state.agreedToTerms) { box?.classList.replace('bg-slate-950','bg-amber-500'); icon?.classList.remove('hidden'); btn.disabled=false; btn.className='w-full py-4.5 rounded-2xl font-black text-lg shadow-xl bg-gradient-to-r from-amber-500 to-amber-700 text-slate-950 text-center transition-all'; } else { box?.classList.replace('bg-amber-500','bg-slate-950'); icon?.classList.add('hidden'); btn.disabled=true; btn.className='w-full py-4.5 rounded-2xl font-black text-lg bg-slate-800 text-slate-500 cursor-not-allowed text-center'; } }
+    async function handlePostSubmit(e) { e.preventDefault(); if (!state.user || !state.agreedToTerms) return; const btn=el('submitBtn'); btn.innerText='認證中...'; btn.disabled=true; const data = { server: el('formServer').value, type: el('formType').value, name: el('formName').value, level: Number(el('formLevel').value), rarity: el('formRarity').value, targetClasses: state.postFormClasses, price: Number(el('formPrice').value), priceType: el('formPriceType').value, contactType: state.contactType, contactValue: el('formContactValue').value, sellerName: el('formSellerName').value, createdAt: serverTimestamp(), userId: state.user.uid, userEmail: state.user.email, isVerified: false }; try { await addDoc(collection(db, 'artifacts', PLATFORM_APP_ID, 'public', 'data', 'listings'), data); window.closeModal('postModal'); el('postForm').reset(); showToast('刊登成功！'); } catch (err) { alert("刊登失敗"); } finally { btn.innerText='發布刊登'; btn.disabled=false; } }
+    async function handleCopy(){ if(!state.contactTarget)return; const t=state.contactTarget.contactValue; try { await navigator.clipboard.writeText(t); } catch(e) { const input=document.createElement("input"); input.value=t; document.body.appendChild(input); input.select(); document.execCommand("copy"); document.body.removeChild(input); } el('copyBtn').className='w-full py-4.5 rounded-2xl font-black bg-green-600 text-white flex items-center justify-center gap-2 shadow-lg text-center'; el('copyText').innerText='複製成功！'; }
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m])); }
-
-    let toastT; function showToast(m){ const t=el('toast-container'); const msg=el('toast-msg'); if(!t || !msg) return; msg.innerText=m; t.classList.remove('opacity-0','-translate-y-4','pointer-events-none'); t.classList.add('opacity-100','translate-y-0'); clearTimeout(toastT); toastT=setTimeout(()=>{t.classList.add('opacity-0','-translate-y-4','pointer-events-none'); t.classList.remove('opacity-100','translate-y-0');},3000); }
+    let toastT; function showToast(m){ const t=el('toast-container'); if(!t) return; el('toast-msg').innerText=m; t.classList.remove('opacity-0','-translate-y-4','pointer-events-none'); t.classList.add('opacity-100','translate-y-0'); clearTimeout(toastT); toastT=setTimeout(()=>{t.classList.add('opacity-0','-translate-y-4','pointer-events-none'); t.classList.remove('opacity-100','translate-y-0');},3000); }
 
     window.addEventListener('DOMContentLoaded', init);
   </script>
