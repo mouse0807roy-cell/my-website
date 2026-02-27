@@ -7,6 +7,13 @@
   
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>">
   
+  <!-- SEO 與社群分享 -->
+  <meta name="description" content="天堂經典交易平台：登入驗證媒合中心，杜絕工作室洗版，保障真實玩家交易安全。全服 15 服即時媒合。" />
+  <meta property="og:title" content="天堂經典交易平台 | 安全驗證媒合中心" />
+  <meta property="og:description" content="登入驗證機制啟動，杜絕工作室洗版，保障真實玩家交易安全。全服 15 服即時媒合。" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1605379399642-870262d3d051?q=80&w=1000" />
+  <meta property="og:type" content="website" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -34,12 +41,10 @@
   </style>
 
   <script>
-    // --- 【關鍵修正】在頁面載入前，立刻偵測是否在 LINE 中，並強制跳轉至外部瀏覽器 ---
+    // --- 在頁面載入前，立刻偵測是否在 LINE 中，並強制跳轉至外部瀏覽器 ---
     (function() {
       const ua = navigator.userAgent || navigator.vendor || window.opera;
       const isLine = /Line/i.test(ua);
-      
-      // 如果是 Line 且網址沒有跳轉參數，立刻補上參數並重新載入 (觸發跳出 Line)
       if (isLine && !window.location.search.includes('openExternalBrowser=1')) {
         const sep = window.location.href.includes('?') ? '&' : '?';
         window.location.href = window.location.href + sep + 'openExternalBrowser=1';
@@ -50,7 +55,7 @@
 
 <body class="pb-28 overflow-x-hidden relative text-left">
 
-  <!-- Line/FB 內建瀏覽器專用攔截遮罩 (如果自動跳轉失敗，作為備用) -->
+  <!-- Line/FB 內建瀏覽器專用攔截遮罩 -->
   <div id="webview-mask">
     <div class="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center mb-6 border border-amber-500/20">
       <i data-lucide="external-link" class="text-amber-500 w-10 h-10 animate-bounce"></i>
@@ -104,12 +109,20 @@
                class="w-full bg-slate-950 border border-slate-800 rounded-2xl py-3.5 pl-11 pr-4 text-sm focus:border-amber-600/50 outline-none transition-all placeholder:text-slate-700 font-medium text-white shadow-inner" />
       </div>
       <div id="serverFilterContainer" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar w-full"></div>
+      <div id="classFilterContainer" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar w-full"></div>
     </div>
 
     <!-- 功能與排序列 -->
     <div class="flex items-center justify-between gap-4 bg-slate-900/40 p-3 rounded-2xl border border-slate-800/60 text-white">
-      <div id="sortFilterContainer" class="flex gap-1.5 p-1 bg-slate-950/50 border border-slate-800 rounded-xl overflow-x-auto no-scrollbar shrink-0"></div>
-      <div class="flex items-center gap-2 ml-auto text-white">
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        <div id="sortFilterContainer" class="flex gap-1.5 shrink-0"></div>
+        <div class="w-px h-4 bg-slate-800 mx-1 shrink-0"></div>
+        <!-- 💡 新增：我的刊登 按鈕 -->
+        <button id="myItemsToggleBtn" onclick="window.toggleMyItems()" class="hidden px-3 py-1.5 rounded-lg text-[11px] font-black transition-all border border-transparent shrink-0 flex items-center gap-1.5 text-slate-400">
+          <i data-lucide="user" class="w-3.5 h-3.5"></i> 我的刊登
+        </button>
+      </div>
+      <div class="flex items-center gap-2 ml-auto text-white shrink-0">
         <button onclick="window.openModal('safetyGuideModal')" class="bg-blue-900/20 text-blue-400 p-2 rounded-xl border border-blue-900/30 shadow-lg"><i data-lucide="shield-check" class="w-4 h-4"></i></button>
         <a id="lineGroupLink" href="#" target="_blank" class="hidden items-center gap-2 bg-[#06C755]/10 text-[#06C755] px-3 py-2 rounded-xl text-[11px] font-black border border-[#06C755]/30 shadow-lg whitespace-nowrap"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> 專屬群</a>
       </div>
@@ -161,15 +174,67 @@
     </div>
   </div>
 
-  <div id="postModal" class="hidden fixed inset-0 z-[550] flex items-center justify-center p-4"><div class="absolute inset-0 bg-slate-950/95 backdrop-blur-md"></div><form id="postForm" class="relative w-full max-w-md bg-slate-900 border border-amber-600/30 rounded-[2rem] shadow-2xl flex flex-col max-h-[94vh] overflow-hidden"><div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50"><h2 class="font-black text-amber-500 text-lg font-serif italic"><i data-lucide="plus-circle" class="w-5 h-5 inline mr-2"></i>簽署刊登契約</h2><button type="button" onclick="window.closeModal('postModal')" class="text-slate-500"><i data-lucide="x" class="w-5 h-5"></i></button></div><div class="p-7 space-y-6 overflow-y-auto no-scrollbar text-left text-white"><div class="grid grid-cols-2 gap-4"><div class="space-y-1"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">目標伺服器</label><select id="formServer" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm font-bold text-white"></select></div><div class="space-y-1"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">物件分類</label><select id="formType" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm text-white"><option value="weapon">武器</option><option value="armor">防具</option><option value="item">道具/天幣</option><option value="magic">魔法/技能</option></select></div></div><div class="space-y-1 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">物品名稱</label><input type="text" id="formName" placeholder="如：+9 闊劍" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm font-bold text-white shadow-inner" /></div><div class="grid grid-cols-2 gap-4"><div class="space-y-1 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">計價類型</label><select id="formPriceType" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm font-bold text-white"><option value="金幣">金幣</option><option value="台幣">台幣 (NT$)</option></select></div><div class="space-y-1 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">期望售價</label><input type="number" id="formPrice" placeholder="輸入數字" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm font-bold text-white shadow-inner text-left" /></div></div><div class="p-5 bg-blue-900/10 border border-blue-900/20 rounded-2xl space-y-4"><input type="text" id="formContactValue" placeholder="您的聯絡 ID (Line/Discord)" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm text-center font-mono font-bold text-white" /><input type="text" id="formSellerName" placeholder="顯示暱稱" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm text-center font-bold text-white" /></div><div id="termsCheckbox" class="p-4 rounded-xl border border-slate-800 bg-slate-900/50 cursor-pointer flex gap-3 items-start select-none hover:bg-slate-800"><div id="termsBoxUI" class="mt-0.5 w-5 h-5 rounded flex items-center justify-center border border-slate-600 bg-slate-950"><i data-lucide="check" id="termsCheckIcon" class="hidden text-slate-950 w-3.5 h-3.5 stroke-[4px]"></i></div><p class="text-[11px] text-slate-400 font-bold leading-relaxed">我已詳細閱讀<span class="text-amber-500 underline mx-1" onclick="event.stopPropagation(); window.openModal('termsModal')">服務規範</span>並同意資訊真實。</p></div></div><div class="p-6 bg-slate-900 border-t border-slate-800 text-center"><button type="submit" id="submitBtn" disabled class="w-full py-4.5 rounded-2xl font-black text-lg shadow-xl uppercase bg-slate-800 text-slate-500 cursor-not-allowed transition-all text-center">發布刊登</button></div></form></div>
-  <div id="contactModal" class="hidden fixed inset-0 z-[500] flex items-center justify-center p-4 text-center"><div class="absolute inset-0 bg-slate-950/85 backdrop-blur-md cursor-pointer text-left text-white" onclick="window.closeModal('contactModal')"></div><div class="relative w-full max-w-sm bg-slate-900 border border-amber-900/40 rounded-[2.5rem] p-8 text-center shadow-2xl animate-in zoom-in duration-200 text-left"><div class="flex justify-between items-start mb-8 text-left text-white"><div class="text-left text-white text-left"><h3 class="text-2xl font-black text-amber-500 italic">聯繫冒險者</h3><p class="text-[10px] text-slate-500 uppercase mt-1">Safe Trade Protocol</p></div><button onclick="window.closeModal('contactModal')" class="bg-slate-800 p-2 rounded-full text-slate-500"><i data-lucide="x" class="w-5 h-5"></i></button></div><div class="bg-slate-950 border border-slate-800 rounded-3xl p-8 mb-8 shadow-inner"><span class="text-[10px] font-black text-slate-500 uppercase block mb-3 text-center">聯絡方式</span><p id="contactValueDisplay" class="text-3xl font-mono font-black text-white mb-8 select-all text-center">---</p><button id="copyBtn" class="w-full py-4.5 rounded-2xl font-black bg-amber-600 text-slate-950 flex items-center justify-center gap-2 active:scale-95 text-center transition-all"><i data-lucide="copy" class="w-5 h-5"></i><span id="copyText">複製 ID</span></button></div><p class="text-[10px] text-red-400 font-black px-4 italic text-center">⚠️ 面交時請務必核對遊戲內「角色暗號」！</p></div></div>
+  <div id="postModal" class="hidden fixed inset-0 z-[550] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-950/95 backdrop-blur-md"></div>
+    <form id="postForm" class="relative w-full max-w-md bg-slate-900 border border-amber-600/30 rounded-[2rem] shadow-2xl flex flex-col max-h-[94vh] overflow-hidden">
+      <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+        <h2 class="font-black text-amber-500 text-lg font-serif italic"><i data-lucide="plus-circle" class="w-5 h-5 inline mr-2"></i>簽署刊登契約</h2>
+        <button type="button" onclick="window.closeModal('postModal')" class="text-slate-500"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-7 space-y-6 overflow-y-auto no-scrollbar text-left text-white">
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">目標伺服器</label><select id="formServer" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm font-bold text-white"></select></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">物件分類</label><select id="formType" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm text-white"><option value="weapon">武器</option><option value="armor">防具</option><option value="item">道具/天幣</option><option value="magic">魔法/技能</option></select></div>
+        </div>
+        
+        <div class="space-y-1 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">物品名稱</label><input type="text" id="formName" placeholder="如：+9 闊劍" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm font-bold text-white shadow-inner" /></div>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-1 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">強化等級 (+)</label><input type="number" id="formLevel" value="0" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm font-bold text-white shadow-inner text-left" /></div>
+          <div class="space-y-1 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">物件色階</label><select id="formRarity" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm font-bold text-white"><option value="common">普通 (白/綠)</option><option value="rare">稀有 (藍)</option><option value="epic">英雄 (紅/紫)</option><option value="legendary">傳說 (金)</option></select></div>
+        </div>
+
+        <div class="space-y-1 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">適用職業</label><div id="formClassesContainer" class="grid grid-cols-4 gap-2"></div></div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-1 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">計價類型</label><select id="formPriceType" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm font-bold text-white"><option value="金幣">金幣</option><option value="台幣">台幣 (NT$)</option></select></div>
+          <div class="space-y-1 text-left"><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">期望售價</label><input type="number" id="formPrice" placeholder="輸入數字" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm font-bold text-white shadow-inner text-left" /></div>
+        </div>
+
+        <div class="p-5 bg-blue-900/10 border border-blue-900/20 rounded-2xl space-y-4">
+          <div class="flex gap-2 p-1 bg-slate-950 rounded-xl border border-slate-800 text-center">
+            <button type="button" onclick="window.setContactType('Line')" id="btnContactLine" class="flex-1 py-2 text-[10px] font-black rounded-lg bg-amber-600 text-slate-950">Line</button>
+            <button type="button" onclick="window.setContactType('Discord')" id="btnContactDiscord" class="flex-1 py-2 text-[10px] font-black rounded-lg text-slate-500">Discord</button>
+          </div>
+          <input type="text" id="formContactValue" placeholder="您的聯絡 ID (Line/Discord)" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm text-center font-mono font-bold text-white" />
+          <input type="text" id="formSellerName" placeholder="顯示暱稱" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm text-center font-bold text-white" />
+        </div>
+        <div id="termsCheckbox" class="p-4 rounded-xl border border-slate-800 bg-slate-900/50 cursor-pointer flex gap-3 items-start select-none hover:bg-slate-800">
+          <div id="termsBoxUI" class="mt-0.5 w-5 h-5 rounded flex items-center justify-center border border-slate-600 bg-slate-950"><i data-lucide="check" id="termsCheckIcon" class="hidden text-slate-950 w-3.5 h-3.5 stroke-[4px]"></i></div>
+          <p class="text-[11px] text-slate-400 font-bold leading-relaxed">我已詳細閱讀<span class="text-amber-500 underline mx-1" onclick="event.stopPropagation(); window.openModal('termsModal')">服務規範</span>並同意資訊真實。</p>
+        </div>
+      </div>
+      <div class="p-6 bg-slate-900 border-t border-slate-800 text-center"><button type="submit" id="submitBtn" disabled class="w-full py-4.5 rounded-2xl font-black text-lg shadow-xl uppercase bg-slate-800 text-slate-500 cursor-not-allowed">發布刊登</button></div>
+    </form>
+  </div>
+
+  <div id="contactModal" class="hidden fixed inset-0 z-[500] flex items-center justify-center p-4 text-center">
+    <div class="absolute inset-0 bg-slate-950/85 backdrop-blur-md cursor-pointer text-left text-white" onclick="window.closeModal('contactModal')"></div>
+    <div class="relative w-full max-w-sm bg-slate-900 border border-amber-900/40 rounded-[2.5rem] p-8 text-center shadow-2xl animate-in zoom-in duration-200 text-left">
+      <div class="flex justify-between items-start mb-8 text-left text-white"><div class="text-left text-white text-left"><h3 class="text-2xl font-black text-amber-500 italic">聯繫冒險者</h3><p class="text-[10px] text-slate-500 uppercase mt-1">Safe Trade Protocol</p></div><button onclick="window.closeModal('contactModal')" class="bg-slate-800 p-2 rounded-full text-slate-500"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+      <p id="contactNtdAlert" class="hidden text-[10px] text-red-400 font-black bg-red-950/40 p-3 rounded-xl border border-red-900/30 mb-4 animate-pulse text-center">⚠️ 警示：此物件採台幣交易。請賣家出示本站驗證資訊以防詐騙。</p>
+      <div class="bg-slate-950 border border-slate-800 rounded-3xl p-8 mb-8 shadow-inner"><span id="contactTypeDisplay" class="text-[10px] font-black text-slate-500 uppercase block mb-3 text-center">聯絡方式</span><p id="contactValueDisplay" class="text-3xl font-mono font-black text-white mb-8 select-all text-center">---</p><button id="copyBtn" class="w-full py-4.5 rounded-2xl font-black bg-amber-600 text-slate-950 flex items-center justify-center gap-2 active:scale-95 text-center transition-all"><i data-lucide="copy" class="w-5 h-5"></i><span id="copyText">複製 ID</span></button></div>
+      <p class="text-[10px] text-red-400 font-black px-4 italic text-center">⚠️ 面交時請務必核對遊戲內「角色暗號」！</p>
+    </div>
+  </div>
+
   <div id="deleteModal" class="hidden fixed inset-0 z-[600] flex items-center justify-center p-4 text-center text-white"><div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm cursor-pointer" onclick="window.closeModal('deleteModal')"></div><div class="relative w-full max-w-sm bg-slate-900 border border-red-900/50 rounded-3xl p-8 text-center shadow-2xl text-white"><i data-lucide="trash-2" class="text-red-500 w-12 h-12 mx-auto mb-4 text-center text-white"></i><h3 class="text-xl font-black text-white mb-2 italic text-red-500 text-center">撤銷刊登？</h3><div class="flex gap-3 text-center mt-6 text-white"><button onclick="window.closeModal('deleteModal')" class="flex-1 py-4 rounded-xl font-bold text-slate-400 bg-slate-800 text-white">保留</button><button id="confirmDeleteBtn" class="flex-1 py-4 rounded-xl font-black text-white bg-red-600 shadow-lg text-white">下架</button></div></div></div>
 
   <!-- ================= 邏輯程式碼 ================= -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    // 💡 關鍵修正：換回 signInWithPopup，因為我們已經把玩家逼出 Line 瀏覽器了，用 Popup 才不會導致迴圈重整遺失登入狀態
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     // Firebase 配置
@@ -188,29 +253,19 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    const EXPIRE_MS = 7 * 24 * 60 * 60 * 1000;
+    const EXPIRE_MS = 7 * 24 * 60 * 60 * 1000; // 7 天過期機制
     const servers = ['全部', '太陽神阿波羅', '愛神邱比特', '勝利女神雅典娜', '美神維納斯', '天神宙斯', '天后海拉', '戰神馬爾斯', '月亮女神阿緹蜜斯', '海神波塞頓', '水蛇許德拉', '冥王黑帝斯', '火神赫發斯特斯', '收獲女神', '蛇髮女', '半人馬'];
     const categories = [{id:'all',label:'全部',icon:'package'},{id:'weapon',label:'武器',icon:'sword'},{id:'armor',label:'防具',icon:'shield'},{id:'item',label:'道具/天幣',icon:'coins'},{id:'magic',label:'魔法',icon:'wand-2'}];
+    const classes = [{id:'全部',label:'全職',icon:'users'},{id:'王族',label:'王族',icon:'crown'},{id:'騎士',label:'騎士',icon:'sword'},{id:'妖精',label:'妖精',icon:'zap'},{id:'魔法師',label:'法師',icon:'flame'}];
     
-    const state = { user: null, items: [], activeTab: 'all', searchQuery: '', selectedServer: '全部', deleteTargetId: null };
+    // state 加入 showMyItemsOnly
+    const state = { user: null, items: [], activeTab: 'all', searchQuery: '', selectedServer: '全部', selectedClass: '全部', deleteTargetId: null, postFormClasses: ['王族', '騎士', '妖精', '魔法師'], contactType: 'Line', showMyItemsOnly: false, currentPage: 1, itemsPerPage: 10, sortBy: 'newest' };
     const el = (id) => document.getElementById(id);
-
-    // 檢查 Webview 並顯示提示
-    function checkWebViewAndShowMask() {
-      const ua = navigator.userAgent || navigator.vendor || window.opera;
-      const isWebview = /Line|FBAN|FBAV|Instagram/i.test(ua);
-      // 如果還是在內建瀏覽器 (代表自動跳轉失敗，如 IG/FB)，強制顯示黑畫面引導
-      if (isWebview) {
-         el('webview-mask').style.display = 'flex';
-         lucide.createIcons();
-      }
-    }
 
     // --- 全局功能掛載 ---
     window.openModal = (id) => el(id)?.classList.remove('hidden');
     window.closeModal = (id) => el(id)?.classList.add('hidden');
     
-    // 💡 關鍵修正：改回使用 signInWithPopup，這能徹底解決輸入密碼後卡在迴圈或沒登入的狀況
     window.handleLogin = async () => {
       try {
         showToast("正在開啟 Google 驗證...");
@@ -219,16 +274,17 @@
         showToast("登入成功！");
       } catch (e) {
         console.error(e);
-        if (e.message.includes('disallowed_useragent') || e.code === 'auth/unauthorized-domain') {
-           el('webview-mask').style.display = 'flex'; // 被擋住時提示切換瀏覽器
+        if (e.message?.includes('disallowed_useragent') || e.code === 'auth/unauthorized-domain') {
+           el('webview-mask').style.display = 'flex';
            lucide.createIcons();
         } else {
-           showToast("登入失敗，請重試");
+           showToast("登入被中斷或取消");
         }
       }
     };
 
     window.handleLogout = async () => { await signOut(auth); showToast("已登出"); };
+    
     window.executeDelete = async () => {
       if(!state.deleteTargetId || !state.user) return;
       try {
@@ -238,12 +294,39 @@
       } catch(e) { showToast('下架失敗：權限不足'); }
     };
 
-    window.toggleFormClass = (cls) => { /* 保留職業選擇 logic... */ };
-    window.setContactType = (type) => { /* 保留 Line/Discord 切換 logic... */ };
+    // 💡 新增：一鍵看自己商品功能
+    window.toggleMyItems = () => {
+      state.showMyItemsOnly = !state.showMyItemsOnly;
+      state.currentPage = 1;
+      updateUI();
+    };
+
+    window.toggleFormClass = (cls) => { 
+      const idx = state.postFormClasses.indexOf(cls); 
+      if (idx > -1) state.postFormClasses.splice(idx,1); 
+      else state.postFormClasses.push(cls); 
+      updateFormClassStyles(); 
+    };
+
+    window.setContactType = (type) => { 
+      state.contactType = type; 
+      if(el('formContactValue')) el('formContactValue').placeholder = `您的 ${type} ID`; 
+      const line = el('btnContactLine'), disc = el('btnContactDiscord');
+      if(line && disc) {
+        line.className = type==='Line' ? 'flex-1 py-2 text-[10px] font-black rounded-lg bg-amber-600 text-slate-950' : 'flex-1 py-2 text-[10px] font-black rounded-lg text-slate-500'; 
+        disc.className = type==='Discord' ? 'flex-1 py-2 text-[10px] font-black rounded-lg bg-amber-600 text-slate-950' : 'flex-1 py-2 text-[10px] font-black rounded-lg text-slate-500'; 
+      }
+    };
+    
     window.openDeleteModal = (id) => { state.deleteTargetId = id; window.openModal('deleteModal'); };
 
     async function init() {
-      checkWebViewAndShowMask();
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+      if (/Line|FBAN|FBAV|Instagram/i.test(ua)) {
+         el('webview-mask').style.display = 'flex';
+         lucide.createIcons();
+      }
+
       renderStaticUI();
       
       onAuthStateChanged(auth, (u) => { 
@@ -252,9 +335,6 @@
         updateUI(); 
       });
       
-      const colRef = collection(db, 'artifacts', PLATFORM_APP_ID, 'public', 'data', 'listings');
-      
-      // 處理資料庫讀取超時
       const loadTimer = setTimeout(() => {
         if (el('loadingIndicator') && !el('loadingIndicator').classList.contains('hidden')) {
            el('loadingIndicator').classList.add('hidden');
@@ -262,6 +342,7 @@
         }
       }, 6000);
 
+      const colRef = collection(db, 'artifacts', PLATFORM_APP_ID, 'public', 'data', 'listings');
       onSnapshot(colRef, (snap) => {
         clearTimeout(loadTimer);
         state.items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -277,6 +358,8 @@
       el('termsCheckbox')?.addEventListener('click', toggleTerms);
       el('confirmDeleteBtn')?.addEventListener('click', window.executeDelete);
       el('copyBtn')?.addEventListener('click', handleCopy);
+      el('prevPageBtn')?.addEventListener('click', () => { if(state.currentPage>1){state.currentPage--; updateUI();} });
+      el('nextPageBtn')?.addEventListener('click', () => { state.currentPage++; updateUI(); });
       el('fabPostBtn')?.addEventListener('click', () => { if (!state.user) window.openModal('loginPromptModal'); else window.openModal('postModal'); });
     }
 
@@ -285,8 +368,8 @@
       if (!area || !dot || !text) return;
       if (state.user) {
         dot.className = "w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse";
-        text.innerText = state.user.displayName;
-        area.innerHTML = `<button onclick="window.handleLogout()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 text-[10px] font-black text-slate-500 transition-colors">登出</button><img src="${state.user.photoURL}" referrerpolicy="no-referrer" class="w-8 h-8 rounded-full border border-amber-600/40 ring-2 ring-amber-600/10">`;
+        text.innerText = state.user.displayName || "已驗證";
+        area.innerHTML = `<button onclick="window.handleLogout()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 text-[10px] font-black text-slate-500 transition-colors">登出</button><img src="${state.user.photoURL}" onerror="this.style.display='none'" referrerpolicy="no-referrer" class="w-8 h-8 rounded-full border border-amber-600/40 ring-2 ring-amber-600/10">`;
       } else {
         dot.className = "w-1.5 h-1.5 bg-slate-500 rounded-full";
         text.innerText = "訪客模式";
@@ -296,58 +379,142 @@
     }
 
     function renderStaticUI() {
-      el('serverFilterContainer').innerHTML = servers.map(s => `<button data-type="server" data-val="${s}" class="filter-btn px-4 py-2 rounded-xl text-[11px] font-black whitespace-nowrap shrink-0 border border-slate-800 transition-all text-white text-left text-white">${s}</button>`).join('');
-      el('formServer').innerHTML = servers.filter(s=>s!=='全部').map(s => `<option value="${s}">${s}</option>`).join('');
-      el('categoryTabsContainer').innerHTML = categories.map(cat => `<button data-type="category" data-val="${cat.id}" class="filter-btn flex-1 flex flex-col items-center py-3 gap-1.5 rounded-2xl transition-all text-white text-left text-white"><i data-lucide="${cat.icon}" class="w-5 h-5 text-white"></i><span class="text-[10px] font-black tracking-widest text-white">${cat.label}</span></button>`).join('');
-      el('sortFilterContainer').innerHTML = [{id:'newest',label:'最新'},{id:'priceAsc',label:'低價'},{id:'priceDesc',label:'高價'}].map(o => `<button data-type="sort" data-val="${o.id}" class="filter-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all border-0 text-white text-left">${o.label}</button>`).join('');
-      document.querySelectorAll('.filter-btn').forEach(btn => { btn.addEventListener('click', (e) => { const {type,val} = e.currentTarget.dataset; if (type==='server') state.selectedServer = val; if (type==='category') state.activeTab = val; if (type==='sort') state.sortBy = val; updateUI(); }); });
+      if(el('serverFilterContainer')) el('serverFilterContainer').innerHTML = servers.map(s => `<button data-type="server" data-val="${s}" class="filter-btn px-4 py-2 rounded-xl text-[11px] font-black whitespace-nowrap shrink-0 border border-slate-800 transition-all text-white text-left text-white">${s}</button>`).join('');
+      if(el('classFilterContainer')) el('classFilterContainer').innerHTML = classes.map(c => `<button data-type="class" data-val="${c.id}" class="filter-btn flex items-center gap-2 px-3.5 py-2 rounded-xl text-[11px] font-black whitespace-nowrap shrink-0 border border-slate-800 transition-all text-white"><i data-lucide="${c.icon}" class="w-3.5 h-3.5"></i>${c.label}</button>`).join('');
+      if(el('formServer')) el('formServer').innerHTML = servers.filter(s=>s!=='全部').map(s => `<option value="${s}">${s}</option>`).join('');
+      if(el('formClassesContainer')) el('formClassesContainer').innerHTML = classes.filter(c=>c.id!=='全部').map(c => `<button type="button" data-val="${c.id}" onclick="window.toggleFormClass('${c.id}')" class="form-class-btn flex flex-col items-center py-3 rounded-2xl border border-slate-800 transition-all text-white"><i data-lucide="${c.icon}" class="w-[20px] h-[20px]"></i><span class="text-[9px] mt-1 font-black">${c.label}</span></button>`).join('');
+      if(el('categoryTabsContainer')) el('categoryTabsContainer').innerHTML = categories.map(cat => `<button data-type="category" data-val="${cat.id}" class="filter-btn flex-1 flex flex-col items-center py-3 gap-1.5 rounded-2xl transition-all text-white text-left text-white"><i data-lucide="${cat.icon}" class="w-5 h-5 text-white"></i><span class="text-[10px] font-black tracking-widest text-white">${cat.label}</span></button>`).join('');
+      if(el('sortFilterContainer')) el('sortFilterContainer').innerHTML = [{id:'newest',label:'最新'},{id:'priceAsc',label:'低價'},{id:'priceDesc',label:'高價'}].map(o => `<button data-type="sort" data-val="${o.id}" class="filter-btn px-3 py-1.5 rounded-lg text-[11px] font-black transition-all border-0 text-white text-left">${o.label}</button>`).join('');
+      document.querySelectorAll('.filter-btn').forEach(btn => { btn.addEventListener('click', (e) => { const {type,val} = e.currentTarget.dataset; if (type==='server') state.selectedServer = val; if(type==='class') state.selectedClass = val; if (type==='category') state.activeTab = val; if (type==='sort') state.sortBy = val; updateUI(); }); });
       lucide.createIcons();
     }
 
     function updateUI() {
       const now = Date.now();
+      
+      // 更新「我的刊登」按鈕狀態
+      const myBtn = el('myItemsToggleBtn');
+      if (myBtn) {
+        if (state.user) {
+          myBtn.classList.remove('hidden');
+          if (state.showMyItemsOnly) {
+            myBtn.classList.add('bg-amber-600/20', 'border-amber-500/50', 'text-amber-400');
+            myBtn.classList.remove('text-slate-400', 'border-transparent');
+          } else {
+            myBtn.classList.remove('bg-amber-600/20', 'border-amber-500/50', 'text-amber-400');
+            myBtn.classList.add('text-slate-400', 'border-transparent');
+          }
+        } else {
+          myBtn.classList.add('hidden');
+          state.showMyItemsOnly = false;
+        }
+      }
+
       let filtered = state.items.filter(item => {
+        // 7天自動過期機制
         if (item.createdAt) { const itemTime = item.createdAt.seconds ? item.createdAt.seconds * 1000 : item.createdAt; if ((now - itemTime) > EXPIRE_MS) return false; }
+        
+        // 優先看自己的商品過濾
+        if (state.showMyItemsOnly && item.userId !== state.user?.uid) return false;
+        
         if (state.activeTab !== 'all' && item.type !== state.activeTab) return false;
         if (state.searchQuery && !String(item.name).toLowerCase().includes(state.searchQuery.toLowerCase())) return false;
         if (state.selectedServer !== '全部' && item.server !== state.selectedServer) return false;
+        if (state.selectedClass !== '全部' && (!item.targetClasses || !item.targetClasses.includes(state.selectedClass))) return false;
         return true;
       });
+
       filtered.sort((a,b) => { if (state.sortBy === 'newest') return (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0); if (state.sortBy === 'priceAsc') return a.price - b.price; if (state.sortBy === 'priceDesc') return b.price - a.price; return 0; });
       if(el('displayServerName')) el('displayServerName').innerText = state.selectedServer;
       if(el('displayItemCount')) el('displayItemCount').innerText = `${filtered.length} ITEMS`;
+      
+      // 分頁機制 (一頁10個)
+      const totalPages = Math.max(1, Math.ceil(filtered.length/state.itemsPerPage)); 
+      state.currentPage = Math.min(state.currentPage, totalPages);
+      const startIndex = (state.currentPage-1)*state.itemsPerPage; 
+      const pagedItems = filtered.slice(startIndex, startIndex+state.itemsPerPage);
+      
       const container = el('itemsContainer'), emptyState = el('emptyState');
       if (container && emptyState) {
-        if (filtered.length > 0) { container.classList.remove('hidden'); emptyState.classList.add('hidden'); container.innerHTML = filtered.map((item) => generateItemHTML(item)).join(''); }
-        else { container.classList.add('hidden'); emptyState.classList.remove('hidden'); }
+        if (pagedItems.length > 0) { 
+          container.classList.remove('hidden'); emptyState.classList.add('hidden'); 
+          container.innerHTML = pagedItems.map((item) => generateItemHTML(item)).join(''); 
+        } else { 
+          container.classList.add('hidden'); emptyState.classList.remove('hidden'); 
+        }
       }
+      
+      const pageCont = el('paginationContainer'); 
+      if (pageCont) { 
+        if (totalPages > 1) { 
+          pageCont.classList.remove('hidden'); 
+          if(el('currentPageDisplay')) el('currentPageDisplay').innerText = state.currentPage; 
+          if(el('totalPagesDisplay')) el('totalPagesDisplay').innerText = totalPages; 
+          if(el('prevPageBtn')) el('prevPageBtn').disabled = state.currentPage === 1; 
+          if(el('nextPageBtn')) el('nextPageBtn').disabled = state.currentPage === totalPages; 
+        } else { pageCont.classList.add('hidden'); } 
+      }
+      
       updateFilterButtonStyles(); lucide.createIcons();
     }
+
+    function resetPage() { state.currentPage = 1; updateUI(); }
 
     function generateItemHTML(item) {
       const isOwner = !!(state.user && state.user.uid === item.userId);
       const timeStr = item.createdAt ? formatTime(item.createdAt.seconds * 1000) : '剛剛';
+      let rarityColor = item.rarity === 'legendary' ? 'text-orange-400 border-orange-500/50 shadow-lg' : item.rarity === 'epic' ? 'text-purple-400 border-purple-500/50' : item.rarity === 'rare' ? 'text-blue-400 border-blue-500/50' : 'text-slate-400';
       return `
-        <div class="bg-slate-900/90 border rounded-2xl p-4 flex justify-between items-center text-left ${isOwner ? 'border-blue-900 bg-blue-950/20 shadow-lg' : 'border-slate-800'}">
+        <div class="bg-slate-900/90 border rounded-2xl p-4 flex justify-between items-center text-left ${isOwner ? 'border-amber-900/80 bg-amber-950/10 shadow-lg' : 'border-slate-800'}">
           <div class="flex gap-4 items-center flex-1 min-w-0">
             <div class="w-14 h-14 rounded-2xl bg-slate-950 border-2 flex items-center justify-center shrink-0 border-slate-800 text-left"><i data-lucide="${item.type==='weapon'?'sword':item.type==='armor'?'shield':item.type==='item'?'coins':'wand-2'}" class="w-7 h-7 text-left"></i></div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2"><span class="text-[9px] font-black px-1.5 py-0.5 bg-amber-900/30 text-amber-500 rounded border border-amber-900/40 uppercase shrink-0 text-left text-white">${item.server}</span><h3 class="font-bold text-slate-100 text-[15px] truncate text-left text-white">${item.name}</h3></div>
-              <div class="flex items-center gap-2 mt-2 w-full overflow-hidden text-left"><span class="text-[9px] text-slate-500 font-bold shrink-0 text-left">${timeStr}</span><span class="text-[11px] text-slate-400 truncate text-left">賣家: ${escapeHtml(item.sellerName || '冒險者')} ${isOwner ? '(您)':''}</span></div>
+              <div class="flex items-center gap-2"><span class="text-[9px] font-black px-1.5 py-0.5 bg-amber-900/30 text-amber-500 rounded border border-amber-900/40 uppercase shrink-0 text-left text-white">${item.server}</span><h3 class="font-bold text-slate-100 text-[15px] truncate text-left text-white">${item.level > 0 ? `+${item.level} ` : ''}${escapeHtml(item.name)}</h3></div>
+              <div class="flex items-center gap-2 mt-2 w-full overflow-hidden text-left"><span class="text-[9px] text-slate-500 font-bold shrink-0 text-left">${timeStr}</span><span class="text-[11px] text-slate-400 truncate text-left">賣家: ${escapeHtml(item.sellerName || '冒險者')} ${isOwner ? '<span class="text-amber-500 font-bold text-left ml-1">(您的刊登)</span>':''}</span></div>
             </div>
           </div>
           <div class="text-right shrink-0 pl-2">
             <p class="text-lg font-black text-amber-400 tracking-tight">${Number(item.price).toLocaleString()} <span class="text-[10px] font-bold opacity-60 text-white">${item.priceType || '金幣'}</span></p>
-            ${isOwner ? `<button onclick="window.openDeleteModal('${item.id}')" class="mt-2 bg-slate-800 text-red-400 border border-slate-700 text-[10px] px-3.5 py-1 rounded-xl font-black">下架</button>` : `<button onclick="window.openContactModalById('${item.id}')" class="mt-2 bg-amber-600 text-slate-950 text-[11px] px-4 py-1.5 rounded-xl font-black shadow-lg">聯絡</button>`}
+            ${isOwner ? `<button onclick="window.openDeleteModal('${item.id}')" class="mt-2 bg-slate-800 text-red-400 border border-slate-700 text-[10px] px-3.5 py-1 rounded-xl font-black text-center text-white">下架</button>` : `<button onclick="window.openContactModalById('${item.id}')" class="mt-2 bg-amber-600 text-slate-950 text-[11px] px-4 py-1.5 rounded-xl font-black shadow-lg text-center text-white">聯絡</button>`}
           </div>
         </div>`;
     }
 
     window.openContactModalById = (id) => { const item = state.items.find(x => x.id === id); if(!item) return; state.contactTarget = item; el('contactValueDisplay').innerText = item.contactValue; window.openModal('contactModal'); lucide.createIcons(); };
     function formatTime(ms) { const diff = (Date.now() - ms) / 1000; if (diff < 60) return '剛剛'; if (diff < 3600) return Math.floor(diff/60) + '分鐘前'; return Math.floor(diff/3600) + '小時前'; }
-    function updateFilterButtonStyles() { document.querySelectorAll('.filter-btn').forEach(btn => { const {type,val} = btn.dataset; let isActive = (type==='server'&&state.selectedServer===val) || (type==='category'&&state.activeTab===val) || (type==='sort'&&state.sortBy===val); if(type==='server') { btn.className = `filter-btn px-4 py-2 rounded-xl text-[10px] font-black whitespace-nowrap shrink-0 border border-slate-800 transition-all ${isActive ? 'bg-amber-600/20 text-amber-400 border-amber-600/50 shadow-inner' : ''}`; } else if(type==='category') { btn.className = `filter-btn flex-1 flex flex-col items-center py-3 gap-1.5 rounded-2xl transition-all ${isActive ? 'bg-slate-800 text-amber-400 shadow-lg scale-105 z-10' : 'text-slate-600'}`; } else { btn.className = `filter-btn px-3.5 py-1.5 rounded-lg text-[10px] font-black border border-slate-800 transition-all ${isActive ? 'bg-amber-600 text-slate-950 border-amber-600 shadow-md scale-105' : 'bg-slate-800/50 text-slate-500'}`; } }); }
+    function updateFilterButtonStyles() { document.querySelectorAll('.filter-btn').forEach(btn => { const {type,val} = btn.dataset; let isActive = (type==='server'&&state.selectedServer===val) || (type==='class'&&state.selectedClass===val) || (type==='category'&&state.activeTab===val) || (type==='sort'&&state.sortBy===val); if(type==='server'||type==='class') { btn.className = `filter-btn ${type==='class'?'flex items-center gap-2':''} px-4 py-2 rounded-xl text-[10px] font-black whitespace-nowrap shrink-0 border border-slate-800 transition-all ${isActive ? 'bg-amber-600/20 text-amber-400 border-amber-600/50 shadow-inner' : ''}`; if(type==='class'){ const svg = btn.querySelector('svg'); if(svg){ svg.classList.remove('text-amber-400','text-slate-600'); svg.classList.add(isActive?'text-amber-400':'text-slate-600'); } } } else if(type==='category') { btn.className = `filter-btn flex-1 flex flex-col items-center py-3 gap-1.5 rounded-2xl transition-all ${isActive ? 'bg-slate-800 text-amber-400 shadow-lg scale-105 z-10' : 'text-slate-600'}`; } else { btn.className = `filter-btn px-3.5 py-1.5 rounded-lg text-[10px] font-black border border-slate-800 transition-all ${isActive ? 'bg-amber-600 text-slate-950 border-amber-600 shadow-md scale-105' : 'bg-slate-800/50 text-slate-500'}`; } }); }
+    function updateFormClassStyles() { document.querySelectorAll('.form-class-btn').forEach(btn => { const isActive = state.postFormClasses.includes(btn.dataset.val); btn.className = `form-class-btn flex flex-col items-center py-3 rounded-2xl border border-slate-800 transition-all ${isActive ? 'bg-amber-600/20 border-amber-500 text-amber-500 shadow-inner' : 'bg-slate-800'}`; }); }
     function toggleTerms() { state.agreedToTerms = !state.agreedToTerms; const box=el('termsBoxUI'), icon=el('termsCheckIcon'), btn=el('submitBtn'); if (state.agreedToTerms) { box?.classList.replace('bg-slate-950','bg-amber-500'); icon?.classList.remove('hidden'); btn.disabled=false; btn.className='w-full py-4.5 rounded-2xl font-black text-lg shadow-xl bg-gradient-to-r from-amber-500 to-amber-700 text-slate-950 text-center'; } else { box?.classList.replace('bg-amber-500','bg-slate-950'); icon?.classList.add('hidden'); btn.disabled=true; btn.className='w-full py-4.5 rounded-2xl font-black text-lg bg-slate-800 text-slate-500 cursor-not-allowed text-center'; } }
-    async function handlePostSubmit(e) { e.preventDefault(); if (!state.user || !state.agreedToTerms) return; const btn=el('submitBtn'); btn.innerText='正在發送...'; btn.disabled=true; const data = { server: el('formServer').value, type: el('formType').value, name: el('formName').value, level: 0, rarity: 'common', price: Number(el('formPrice').value), priceType: el('formPriceType').value, contactType: 'Line', contactValue: el('formContactValue').value, sellerName: el('formSellerName').value, createdAt: serverTimestamp(), userId: state.user.uid, userEmail: state.user.email, isVerified: false }; try { await addDoc(collection(db, 'artifacts', PLATFORM_APP_ID, 'public', 'data', 'listings'), data); window.closeModal('postModal'); el('postForm').reset(); showToast('刊登成功！'); } catch (err) { alert("發布失敗，請確認資料庫權限設定"); } finally { btn.innerText='發布刊登'; btn.disabled=false; } }
+    
+    async function handlePostSubmit(e) { 
+      e.preventDefault(); 
+      if (!state.user || !state.agreedToTerms) return; 
+      const btn=el('submitBtn'); btn.innerText='正在發送...'; btn.disabled=true; 
+      const data = { 
+        server: el('formServer')?.value || '全部', 
+        type: el('formType')?.value || 'weapon', 
+        name: el('formName')?.value || '未命名', 
+        level: Number(el('formLevel')?.value || 0), 
+        rarity: el('formRarity')?.value || 'common', 
+        price: Number(el('formPrice')?.value || 0), 
+        priceType: el('formPriceType')?.value || '金幣', 
+        contactType: state.contactType, 
+        contactValue: el('formContactValue')?.value || '', 
+        sellerName: el('formSellerName')?.value || '冒險者', 
+        targetClasses: state.postFormClasses,
+        createdAt: serverTimestamp(), 
+        userId: state.user.uid, 
+        userEmail: state.user.email, 
+        isVerified: false 
+      }; 
+      try { 
+        await addDoc(collection(db, 'artifacts', PLATFORM_APP_ID, 'public', 'data', 'listings'), data); 
+        window.closeModal('postModal'); el('postForm').reset(); 
+        state.postFormClasses=['王族','騎士','妖精','魔法師']; updateFormClassStyles();
+        showToast('刊登成功！'); 
+      } catch (err) { alert("發布失敗，請確認資料庫權限設定"); } finally { btn.innerText='發布刊登'; btn.disabled=false; } 
+    }
+    
     async function handleCopy(){ if(!state.contactTarget)return; const t=state.contactTarget.contactValue; try { await navigator.clipboard.writeText(t); } catch(e) { const input=document.createElement("input"); input.value=t; document.body.appendChild(input); input.select(); document.execCommand("copy"); document.body.removeChild(input); } el('copyBtn').className='w-full py-4.5 rounded-2xl font-black bg-green-600 text-white flex items-center justify-center gap-2 shadow-lg text-center'; el('copyText').innerText='複製成功！'; }
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m])); }
     let toastT; function showToast(m){ const t=el('toast-container'); if(!t) return; el('toast-msg').innerText=m; t.classList.remove('opacity-0','-translate-y-4','pointer-events-none'); t.classList.add('opacity-100','translate-y-0'); clearTimeout(toastT); toastT=setTimeout(()=>{t.classList.add('opacity-0','-translate-y-4','pointer-events-none'); t.classList.remove('opacity-100','translate-y-0');},3000); }
